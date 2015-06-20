@@ -2,5 +2,5 @@ packrat/lib*/
 packrat/src
 .Rproj.user
 .Rhistory
-*md
+*.md
 *html
