@@ -1,0 +1,76 @@
+---
+output: 
+  html_document: 
+    fig_caption: yes
+    keep_md: yes
+    number_sections: yes
+bibliography: pepr-pub.bib
+---
+```{r, echo = FALSE, message = FALSE}
+source("rm_metadata.R")
+```
+
+```{r, echo = FALSE, message=FALSE}
+library(png)
+library(jpeg)
+library(grid)
+library(peprr)
+library(dplyr)
+library(knitr)
+```
+
+```{r echo=FALSE, message=FALSE} 
+peprDB <- dplyr::src_sqlite(db_path)
+```
+
+# Results
+## Summary of Sequencing Datasets
+The MiSeq sequencing run resulted in over 1.5 million pair end (3 million total) reads per library with a median read lenght just under 250 bp.  Where as the PGM sequencing run produced about 0.5 million reads per library with a median read length around 235 bp.  The higher throughput and paried end reads resulted in a higher per library coverage for MiSeq compared to PGM (~140X vs. ~30X).  Despite using the 400bp sequencing chemistry the PGM median read length was less than 250 bp.  The shorter read length is potentially due to the low GC content, but further analysis is required to confirm this hypothesis.
+
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+kable(seq_summary_table(peprDB), 
+      round = 0, row.names = FALSE, caption = "Summary of sequencing datasets")
+```
+
+## Genome Assembly
+The _de-novo_ assembly using PacBio data was performed using the HGAP assembler, as part of the SMRTanalysis software (__version info__), resulting in a closed genome and plasmid assembly. Optical mapping data agreed with the _de novo_ assembly (Figure AssemblyComp). The plasmid is too small for OpGen optical mapping technology and therefore the plasmid assmebly was not validated with the optical mapping data.  
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap= "Comparison of optical map data to genome assembly."}
+# __SPECIFIC TO RM__
+grid.raster(readPNG("opgen_assembly_comparison.png"))
+```
+
+## Base Level Analysis
+### Base Purity
+A base purity metric was used for base level analysis.  The purity value is the number bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  Comparison of the purity values between for all positions in the genome for two orthogonal sequencing methods was used to differentiate between positions with low purity values due to platform specific biases and those due to true biological diversity.  For RM8376 no positions have purity values less than 0.95 for both platforms, and only 4 positions with purity values less than 0.97 \% for both platforms, indicating a low level of biological variability within the material.  A number (need to calculate) of positions have purity values <0.98 for MiSeq and >0.98 for PGM or <0.98 for PGM and >0.98 for MiSeq.  These the low purity values on one platform and not another indicate a platform specific bias.  We are assuming that a systematic bias or sequencing error is responsible for the lower value. The reference base is identified using a third orthogonal sequencing method (PacBio) and thus a low value for one of the two short reads sequencing platforms represents agreement between two of the three sequencing methods.  It is also important to acknowledge that the two platforms in agreement are susceptible to the same bias and thus the outlier platform could indicate the true value.  The sequencing technology used to chracterize the material is still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
+
+```{r echo = FALSE, message = FALSE, warnings = FALSE, fig.align='center', fig.show = 'asis', fig.cap= "Comparison of base purity values for PGM and MiSeq."}
+purity_scatter_plot(peprDB)
+```
+
+__TODO__ Bias Metrics __TODO__
+
+### Sequence homogeneity
+The genomic material homogeneity was assessed through a pairwise statistical analysis of the replicate MiSeq datasets using the varsan somatic variant caller.  The pairwise variant analysis failed to identify any statistically significant base level differences among the replicates.
+
+```{r echo =FALSE}
+kable(homogeneity_sig_table(peprDB, rename_cols = TRUE), 
+      row.names = FALSE,
+      caption = "Pairwise variant analysis results")
+```
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.show = 'asis', fig.cap= "Among sample variation in purity values."}
+#not needed to support statements in report
+#homogeneity_point_line_figure(peprDB)
+```
+
+#### Genomic Purity
+Based on taxonomic assignment of the PGM and MiSeq data the reference material has minimal if any genomic contaminants (Figure GenPur BoxPlot), __TODO__ add calculations__TODO__.  The most abundant contaminant was _Escherichia coli_ which is a well documented contaminant of molecular biology reagents. Lower abundance contaminants are most likely bioinformatic errors and not true contaminants. To provide a conservative estimate of the genomic purity the stated value assumes all reads identified as not beloning to the genus _Staphylococcus_ are contamiants.
+
+```{r echo = FALSE, fig.align='center', fig.show = 'asis', fig.cap= "Proportion of reads from contaminant DNA.", warning=FALSE, message=FALSE}
+contam_counts_figure(peprDB, rm_genus)
+```
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.height = 6, fig.cap= "Breakdown of contaminants by organism.",fig.retina=TRUE}
+contam_point_line_figure(peprDB, rm_genus)
+```
