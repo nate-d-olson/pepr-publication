@@ -4,79 +4,33 @@ output:
     fig_caption: yes
     keep_md: yes
     number_sections: yes
-bibliography: micro_rm_references.bib
+bibliography: pepr-pub.bib
 ---
 # Methods
 ## Pipeline for Evaluating Prokaryotic References: PEPR
-* overall workflow
-* bioinformatics
-	* input - parameter file yaml
-		* example structure
-	* output - runtime parameters file
-	    * example structure
-	* pipelines
-		* github - https://github.com/nate-d-olson/pepr
-		* Genome Evaluation Pipeline
-		* Genome Characterization Pipeline
-		* Genomic Purity Pipeline
-	* logging documentation
-		* time stamped log files are generated for each command executed as part of the pipeline
-		* time stamped standard error files are generated for applicable commands
-	* dependencies
-		* To reduce the barrier for reuse two Docker (https://www.docker.com/) containers were developed with pipeline dependencies excluding GATK are pre-installed.
-		* Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system.
-			* pepr (https://registry.hub.docker.com/u/natedolson/pepr/) with dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository.
-			* docker-pathoscope (https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) with dependencies for the genomic purity pipeline.
-
-* R package
-	* github https://github.com/nate-d-olson/peprr
-	* A software package was developed for the statistical computing languge R to compile the output from the genome evaluation, characterization, and genomic purity pipelines [@R2015].
-	* The compiled data was manipulated into a series of data tables within an sqlite database to facilitate analysis [@wickham2014tidy].  
-	* Functions to generate a number of summary tables and figures, including those in this publication are included in the package.
-
-* general requirements
-    * Memory, Storage, Runtime
+Pipeline for Evaluating Prokaryotic Reference (PEPR) consists of three bioinformatic pipelines written in python.  The three bioinformatic pipelines are Genome Evaluation, Genome Characterization, and Genomic Purity.  Bioinformatic pipeline inputs defined with a yaml file.  The individual pipeline coordinates the execution of a number of commandline tools, ogging the standard output and standard error for each step in the pipeline  in time stamped files for later inspection and debugging. Pipeline code avaiable at [github.com/nate-d-olson/pepr](https://github.com/nate-d-olson/pepr). To reduce the barrier for reuse two Docker (https://www.docker.com/) containers are available with pipeline dependencies pre-installed excluding the Genome Analysis Toolkit (due to licensing restrictions). Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system. The pepr container (https://registry.hub.docker.com/u/natedolson/pepr/) includes dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository. The docker-pathoscope (https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) has dependencies for the genomic purity pipeline installed.
+    A software package peprr [github.com/nate-d-olson/peprr](github https://github.com/nate-d-olson/peprr) was developed for the statistical computing languge R to compile the output from the genome evaluation, characterization, and genomic purity pipelines [@R2015]. The compiled data was manipulated into a series of data tables within an sqlite database to facilitate analysis [@wickham2014tidy].  Functions to generate a number of summary tables and figures, including those in this publication are included in the package.
 
 ## Pipeline Specific Methods
 ### Genome Evaluation Pipeline
-* Input reference genome is indexed using tmap __REF__, BWA __REF__, SAMtools [@Li2009], and Picard __REF__.
-* The sequencing reads are then mapped to the reference genome using bwa (MiSeq and PacBio) and tmap (PGM).
-* Finally Pilon was used to evaluate and polish the assembly [@Walker2014]
+The Genome Evaluation pipeline is the first step in the PEPR workflow and uses whole genome sequencing data to evaluate and correct misasseblies in the reference genome. Sequencing data are first retrieved from the Genbank Sequence Read Archive (SRA) using the sratoolkit fastq-dump [http://ncbi.github.io/sra-tools/](http://ncbi.github.io/sra-tools/). The sequencing reads are then mapped to the reference genome using bwa (MiSeq and PacBio)[@Li2013c] and tmap [@Homer]. Finally Pilon was used to evaluate and polish the reference assembly assembly [@Walker2014].  The revised reference genome is then further characterized in the Genome Characterization Pipeline.
 
 ### Genome Characterization Pipeline
-* The input reference genome is idexed and sequencing files are processed using the same method as with the Genome evaluation pipeline. 
-* Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates __REF__, realignment around indels with the GenomeAnalysisToolKit __REF__ .
-* A number of summary statistics are caclulated for the sequencing datassets and alignment files, using fastqc __REF__ and Picard Collect Multiple Metrics.  
-* Base level summary statistics are calculated using SAMtools mpileup
-* Homogeneity analysis was performed by first generating a pileup file for each dataset then performing pairwise tumor-normal variant calling using Varscan [@Koboldt2009].
+The Genome Characterication Pipeline uses replicate sequence datasets from multiple sequencing platforms for evaluate the reference genome on a individual base level. Seqeuncing data is aligned to the reference genome using the same methods as the Genome Evaluation pipeline. Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates [http://broadinstitute.github.io/picard](http://broadinstitute.github.io/picard), realignment around indels with the GenomeAnalysisToolKit [@McKenna2010; @DePristo12011]. The base level summary statistics are calculated using SAMtools mpileup [@Li2009].  Homogeneity analysis, measure of the similarity of the genomic content between replicate samples, was performed by first generating a pileup file for each dataset then performing pairwise tumor-normal variant calling using Varscan [@Koboldt2009]. Additionally, a number of summary statistics are caclulated for the sequencing datasets and alignment files, using fastqc (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/)[http://www.bioinformatics.babraham.ac.uk/projects/fastqc/] and Picard Collect Multiple Metrics [http://broadinstitute.github.io/picard](http://broadinstitute.github.io/picard) respectively.  
 
 ### Genomic Purity Pipeline
-The purity of the genomic material in terms of presense of DNA from sources other than the expected strain was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 [@Hong2014].  This method uses an expectation maximization algorithm where the sequence data are first mapped to a database comprised on all sequence data in the Genbank nt database, then through an iterative process re-assigns ambiguously mapped reads to based on the proportion of reads mapped unambigously to individual taxa in the database. The PathoScope 2.0 taxonomic read classification pipeline includes an initial read filtering step (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 __REF__), then an expectation-maximization classification algorithm (PathoID).  The annotated Genbank nt database provided by the PathoScope developers was used as the reference database __LINK__. 
+The purity of the genomic material in terms of presense of DNA from sources other than the expected strain was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 [@Hong2014].  This method uses an expectation maximization algorithm where the sequence data are first mapped to a database comprised on all sequence data in the Genbank nt database, then through an iterative process re-assigns ambiguously mapped reads to based on the proportion of reads mapped unambigously to individual taxa in the database. The PathoScope 2.0 taxonomic read classification pipeline includes an initial read filtering step (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 [@Langmead2012]), then an expectation-maximization classification algorithm (PathoID).  The annotated Genbank nt database provided by the PathoScope developers was used as the reference database ([ftp://pathoscope.bumc.bu.edu/data/nt_ti.fa.gz](ftp://pathoscope.bumc.bu.edu/data/nt_ti.fa.gz)). 
     
 ## _S. aureus_ Sequencing
 ### Material
-* RM8376 is extracted genomic DNA from _Staphylococcus areus_ strain NRS100 isolate COL (Biosample SAMN02854573).  The strain was selected based on public health relevance and it's low %GC.  The strain was selected for use by the FDA and isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075).  The strain is resistant to the antibiotics oxacillin and tetracycline.
+RM8376 is extracted genomic DNA from _Staphylococcus areus_ strain NRS100 isolate COL (Biosample SAMN02854573).  The strain was selected based on public health relevance and it's low %GC.  The strain was selected for use by the FDA and isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075).  The strain is resistant to the antibiotics oxacillin and tetracycline.
 
 A single colony was obtained from the initial culture stab after an overnight incubation at 37°C on an plate. A single colony was used to innoculate a new plate. One colony from the new plate was grown in 20 mL LB at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. Glycerol freezes were made from the remaining stock. DNA and agarose plugs were made from the 15 x 150 mm plates. DNA was isolated by lysing the bacteria in lysis Solution containing NaCl, Tris, EDTA and lysostaphin (25 µ g/ml) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol. Drained, then dissolved in TE (Tris 10 mM, EDTA 0.1 mM, pH8.0).
 
 ### Experimental Design
-Experimental Design
-    * Long read sequencing using PacBio
-        * Library prep and sequencing methods __TODO__
-    * 8 replicate vials 
-        * MiSeq 2 X 300, duplicate libraries
-        * Library prep and sequencing methods __TODO__
-    * PGM 
-        * 400 single-end libraries
-        * Library prep and sequencing methods __TODO__
-    * The raw sequence data is archived at the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see __TABLE SEQ INFO__  for accession numbers. 
+The _S. aureus_ candidate reference materials were sequenced using three orthogonal sequences methods. Long read sequencing using PacBio, __TODO__ Library prep and sequencing methods __TODO__.  Eight replicate vials were randomly sampled from the lot of 1500 vials and sequenced using two short read sequencing technologies, Ion Torrent PGM, and Illumina MiSeq. Technical replicate sequencing libraries were prepared for each of the eight vials using the Nextera library prep kit with 2 X 300 bp reads.  The 16 libraries were pooled and sequencing in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using __TODO__ library prep and sequencing methods __TODO__. The raw sequence data is archived at the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see __TABLE SEQ INFO__ for accession numbers. 
 
 ## Reference assembly
-* PacBio long read data was used to generate a reference genome assembly
-    * Reads assembled using HGAP assembler - version__TODO__ __REF__ 
-* Assembly validation
-    * Optical maiing data from OpGen was used to validate the assembly.
-    * Only able to detect missassemblies larger than 3kb.
-* Not part of the PEPR
+PacBio long read data was used to generate the reference genome assembly used as input with the Genome Evaluation Pipeline. PacBio Reads wereassembled using HGAP assembler - version __TODO__ [@Koren2013].  The _de novo_ assembly was validated using OpGen optical mapping data.  Agarose plugs prepared from the same large culture used to generate the candidate reference material was used for the optical mapping measurements.
 
 # References
