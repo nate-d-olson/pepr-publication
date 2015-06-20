@@ -1,0 +1,25 @@
+---
+title: "Pipeline for Evaluating Prokaryotic References"
+author: "Nate Olson"
+date: "June 15, 2015"
+output: html_document
+---
+
+## Authors
+Nathan D. Olson
+Justin Zook
+Scott A. Jackson
+Marc L. Salit
+
+## Abstract
+
+## Introduction
+
+## Methods
+
+## Results
+
+## Discussion
+
+## References
+
