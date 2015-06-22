@@ -4,3 +4,4 @@ packrat/src
 .Rhistory
 *.md
 *html
+packrat/src/

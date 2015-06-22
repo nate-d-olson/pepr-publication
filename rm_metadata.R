@@ -10,5 +10,4 @@ strain_source <- "Children's National Hostipal."
 rm_genome_size <- 2.8*10^6
 
 # Database location
-db_path <- "/Volumes/NDO_PROJECT/current_projects/micro_rm//micro_rm/pepr-data/MG002/MG002.sqlite"
-# db_path <- "/media/nolson/second2/current_projects/micro_rm/pepr-data/MG002/CFSAN030013_miseq.sqlite"
+db_path <- "/Volumes/External-SSD/pepr-data/MG002/MG002.sqlite"

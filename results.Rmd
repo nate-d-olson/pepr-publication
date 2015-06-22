@@ -12,7 +12,6 @@ source("rm_metadata.R")
 
 ```{r, echo = FALSE, message=FALSE}
 library(png)
-library(jpeg)
 library(grid)
 library(peprr)
 library(dplyr)
@@ -33,9 +32,9 @@ kable(seq_summary_table(peprDB),
 ```
 
 ## Genome Assembly
-The _de-novo_ assembly using PacBio data was performed using the HGAP assembler, as part of the SMRTanalysis software (__version info__), resulting in a closed genome and plasmid assembly. Optical mapping data agreed with the _de novo_ assembly (Figure AssemblyComp). The plasmid is too small for OpGen optical mapping technology and therefore the plasmid assmebly was not validated with the optical mapping data.  
+The _de-novo_ assembly using PacBio data was performed using the HGAP assembler, resulting in a closed genome and plasmid assembly. Optical mapping data agreed with the _de novo_ assembly (Figure AssemblyComp). The plasmid is too small for OpGen optical mapping technology and therefore the plasmid assmebly was not validated with the optical mapping data.  
 
-```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.cap= "Comparison of optical map data to genome assembly."}
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.scap= "Comparison of optical map data to genome assembly.", fig.cap = "Alignment of _in silico_ and "}
 # __SPECIFIC TO RM__
 grid.raster(readPNG("opgen_assembly_comparison.png"))
 ```
