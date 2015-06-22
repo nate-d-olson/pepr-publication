@@ -1,10 +1,11 @@
 ---
-title: "Pipeline for Evaluating Prokaryotic References"
+title: "PEPR: Pipeline for Evaluating Prokaryotic References"
 author: "Nate Olson"
 date: "June 15, 2015"
 output: html_document
 ---
-
+Figure and table numbering 
+http://www.r-bloggers.com/writing-papers-using-r-markdown/
 ## Authors
 Nathan D. Olson
 Justin Zook
@@ -20,6 +21,9 @@ Marc L. Salit
 ## Results
 
 ## Discussion
+
+PGM read length
+The shorter read length is potentially due to the low GC content, but further analysis is required to confirm this hypothesis.
 
 ## References
 
