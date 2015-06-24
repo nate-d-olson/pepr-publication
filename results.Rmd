@@ -40,7 +40,7 @@ grid.raster(readPNG("opgen_assembly_comparison.png"))
 ```
 
 __TODO__ Pilon Results __TODO__
-* fix code for loading table
+* re-run pipeline with latest version of pilon
 * histogram of positions
 * comparison of pgm and miseq
 
@@ -49,7 +49,7 @@ __TODO__ Pilon Results __TODO__
 A base purity metric was used for base level analysis.  The purity value is the number bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  Comparison of the purity values between for all positions in the genome for two orthogonal sequencing methods was used to differentiate between positions with low purity values due to platform specific biases and those due to true biological diversity.  For RM8376 no positions have purity values less than 0.95 for both platforms, and only 4 positions with purity values less than 0.97 \% for both platforms, indicating a low level of biological variability within the material.  A number (need to calculate) of positions have purity values <0.98 for MiSeq and >0.98 for PGM or <0.98 for PGM and >0.98 for MiSeq.  These the low purity values on one platform and not another indicate a platform specific bias.  We are assuming that a systematic bias or sequencing error is responsible for the lower value. The reference base is identified using a third orthogonal sequencing method (PacBio) and thus a low value for one of the two short reads sequencing platforms represents agreement between two of the three sequencing methods.  It is also important to acknowledge that the two platforms in agreement are susceptible to the same bias and thus the outlier platform could indicate the true value.  The sequencing technology used to chracterize the material is still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
 
 ```{r echo = FALSE, message = FALSE, warnings = FALSE, fig.align='center', fig.show = 'asis', fig.cap= "Comparison of base purity values for PGM and MiSeq."}
-purity_scatter_plot(peprDB)
+purity_plot <- purity_scatter_plot(peprDB)
 ```
 __TODO__ Modify to indicate different regions __TODO__ - Add margins
 - use different colors to indicate regions
