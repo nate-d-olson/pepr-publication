@@ -125,12 +125,16 @@ low_pur_pos <- pur_dat_id_filt$POS
 cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
                         filter(POS %in% low_pur_pos) %>% 
                         ungroup() %>% 
-                        mutate(metric = paste(PLAT, metric, sep = "_"))
+                        mutate(metric = paste(PLAT, metric, sep = "_")) %>%     
+                        select(-PLAT, -value) %>% 
+                        spread(metric, bin)
                             
 cb_miseq_metrics_bin <- cb_miseq_metrics %>% 
                             filter(POS %in% low_pur_pos) %>% 
                             ungroup() %>% 
-                            mutate(metric = paste(PLAT, metric, sep = "_"))
+                            mutate(metric = paste(PLAT, metric, sep = "_")) %>% 
+                            select(-PLAT, -value) %>% 
+                            spread(metric, bin)
 ```
 
 ```{r}
@@ -143,7 +147,8 @@ RPB_miseq <- cb_miseq_metrics_bin %>%
                 filter(metric == "miseq_RPB") %>% 
                 select(-PLAT, -value, -metric) %>% 
                 rename(miseq_RPB = bin)
-pur_RPB_bin <- left_join(pur_dat_id_filt, RPB_pgm) %>% left_join(RPB_miseq)
+pur_RPB_bin <- left_join(pur_dat_id_filt, cb_pgm_metrics_bin) %>%
+                    left_join(cb_miseq_metrics_bin)
 ```
 
 ## Comparison plots
