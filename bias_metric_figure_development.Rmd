@@ -4,9 +4,8 @@ author: "Nate Olson"
 date: "June 23, 2015"
 output: html_document
 ---
-## Objectives
-
-## General Approach
+## Background
+Individual genome positions were initially characterized for the position purity values for MiSeq and PGM sequencing platforms. Positions were divided into four groups those with high purity (> 0.99) for both platforms, low purity for one of the two platforms, and low purity for both platforms.  Bias metrics calculated by samtools are used to better characterize the genome positions in each group.
 
 ```{r echo=FALSE, message=FALSE}
 library(Hmisc)
@@ -58,13 +57,24 @@ ggplot2::ggplot(pur_dat_id_filt) +
 
 
 
-### Group Summary Table
+### Summary Table
+Position abundance for each of the four groups
 ```{r}
 pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable()
 ```
 
+## Metric Descriptions
+Five metrics, read position bias, mapping quality bias, base quality bias, and mapping quality vs. strand bias were user to characterize the four groups. 
 
-### Binning metric values
+### Descriptions from the vcf file header
+__RPB__: "Mann-Whitney U test of Read Position Bias (bigger is better)"
+__MQB__: "Mann-Whitney U test of Mapping Quality Bias (bigger is better)"
+__BQB__: "Mann-Whitney U test of Base Quality Bias (bigger is better)"
+__MQSB__: "Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)"
+__MQ0F__: "Fraction of MQ0 reads (smaller is better)"
+
+## Binning metrics values
+Values for each metric were bined into 10 equal sized bins.
 ```{r cache=TRUE}
 pgm_datasets <- dplyr::tbl(db_con, "cb_pgm") %>% 
                 select(SAMPLE) %>% collect() %>% 
@@ -86,26 +96,9 @@ cb_pgm_metrics <- dplyr::tbl(db_con, "cb_pgm") %>%
 ggplot(cb_pgm_metrics) + 
         geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
         theme_bw() + ggtitle("PGM Metric Bin Values")
-# ggplot(cb_miseq_metrics) + 
-#     geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
-#     theme_bw() + ggtitle("MiSeq Metrics Bin Values")
 ```
 
-
-## Metric Descriptions
-Metrics Descriptions are from the vcf file header
-RPB
-: "Mann-Whitney U test of Read Position Bias (bigger is better)"
-MQB
-: "Mann-Whitney U test of Mapping Quality Bias (bigger is better)">
-BQB
-: "Mann-Whitney U test of Base Quality Bias (bigger is better)"
-MQSB
-: "Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)"
-MQ0F
-: "Fraction of MQ0 reads (smaller is better)"
-
-### Correlating Purity ID and metric bins
+## Evaluating PGM Bias metrics
 ```{r cache=TRUE}
 low_pur_pos <- pur_dat_id_filt$POS
 cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
@@ -117,7 +110,7 @@ cb_pgm_metrics_bin <- cb_pgm_metrics %>%
 pur_pgm_bin <- left_join(pur_dat_id_filt, cb_pgm_metrics_bin)
 ```
 
-## Evaluating PGM Bias metrics
+
 ```{r cache=TRUE}
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 ggplot(pur_pgm_bin) + 
@@ -172,7 +165,7 @@ ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_RPB))) +
     theme_bw() + labs(title = "RPB PGM Bins", x = "Bin")
 ```
 
-## Evaluating Miseq Bias Analysis
+## Evaluating Miseq Bias
 ```{r cache=TRUE}
 low_pur_pos <- pur_dat_id_filt$POS
 miseq_datasets <- dplyr::tbl(db_con, "cb_miseq") %>% 
@@ -189,9 +182,11 @@ cb_miseq_metrics <- dplyr::tbl(db_con, "cb_miseq") %>%
     group_by(metric)  %>% 
     filter(!is.na(value)) %>% 
     mutate(bin = ntile(value, n = 10))
+```
 
+```{r cache = TRUE}
 low_pur_pos <- pur_dat_id_filt$POS
-cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
+cb_miseq_metrics_bin <- cb_miseq_metrics %>% 
                         filter(POS %in% low_pur_pos) %>% 
                         ungroup() %>% 
                         mutate(metric = paste(PLAT, metric, sep = "_")) %>%     
@@ -201,6 +196,12 @@ cb_pgm_metrics_bin <- cb_pgm_metrics %>%
 pur_miseq_bin <- left_join(pur_dat_id_filt, cb_miseq_metrics_bin)
 ```
 
+```{r}
+ggplot(cb_miseq_metrics) + 
+    geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
+    theme_bw() + ggtitle("MiSeq Metrics Bin Values")
+```
+
 ```{r cache=TRUE}
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 ggplot(pur_miseq_bin) + 
@@ -208,9 +209,9 @@ ggplot(pur_miseq_bin) +
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
     ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + 
-    facet_wrap(~pgm_BQB) + ggtitle("MiSeq BQB Bias Metrics")
+    facet_wrap(~miseq_BQB) + ggtitle("MiSeq BQB Bias Metrics")
 
-ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(pgm_BQB))) +
+ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_BQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "BQB MiSeq Bins", x = "Bin")
 
@@ -218,9 +219,9 @@ ggplot(pur_miseq_bin) +
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
-    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~pgm_MQ0F)+ ggtitle("MiSeq MQ0F Bias Metrics")
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~miseq_MQ0F)+ ggtitle("MiSeq MQ0F Bias Metrics")
 
-ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(pgm_MQ0F))) +
+ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQ0F))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQ0F MiSeq Bins", x = "Bin")
 
@@ -228,9 +229,9 @@ ggplot(pur_miseq_bin) +
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
-    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~pgm_MQB) + ggtitle("MiSeq MQB Bias Metrics")
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~miseq_MQB) + ggtitle("MiSeq MQB Bias Metrics")
 
-ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(pgm_MQB))) +
+ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQB MiSeq Bins", x = "Bin")
 
@@ -238,9 +239,9 @@ ggplot(pur_miseq_bin) +
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
-    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~pgm_MQSB) + ggtitle("MiSeq MQSB Bias Metrics")
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~miseq_MQSB) + ggtitle("MiSeq MQSB Bias Metrics")
 
-ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(pgm_MQSB))) +
+ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQSB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQSB MiSeq Bins", x = "Bin")
 
@@ -248,9 +249,9 @@ ggplot(pur_miseq_bin) +
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
-    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~pgm_RPB) + ggtitle("PGM MiSeq Bias Metrics")
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) + facet_wrap(~miseq_RPB) + ggtitle("MiSeq Bias Metrics")
 
-ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(pgm_RPB))) +
+ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_RPB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "RPB MiSeq Bins", x = "Bin")
 ```
