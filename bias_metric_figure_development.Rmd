@@ -10,17 +10,18 @@ output: html_document
 
 ```{r echo=FALSE, message=FALSE}
 library(Hmisc)
+library(magrittr)
 library(ggplot2)
 library(peprr)
 library(dplyr)
 library(tidyr)
 library(knitr)
-library(magrittr)
 ```
 
 ### Loading Data
 ```{r}
-db_con <-  dplyr::src_sqlite("/Volumes/NDO_PROJECT/current_projects/micro_rm/pepr-data/MG002/MG002.sqlite")
+#db_con <-  dplyr::src_sqlite("/Volumes/NDO_PROJECT/current_projects/micro_rm/pepr-data/MG002/MG002.sqlite")
+db_con <- dplyr::src_sqlite("/Volumes/Transcend/micro_rm/MG002.sqlite")
 .get_chrom_names <- function(db_con){
     dplyr::tbl(db_con, "pur_join") %>%
         dplyr::select(CHROM) %>%
@@ -33,33 +34,23 @@ chrom_names <- .get_chrom_names(db_con)
 
 ### Labeled Purity Scatter Plot
 ```{r}
-set_pur_group <- function(plat1, plat2){
-    if(plat1 < 0.99){
-        if(plat2 < 0.99){
-            return("both_low")
-        }else{
-            return("plat1_low")
-        }
-    }else if(plat2 < 0.99){
-        return("plat2_low")
-    }else{
-        return("both_high")
-    }
-}
-pur_dat_id <- dplyr::tbl(db_con, "pur_join") %>%
+pur_dat <- dplyr::tbl(db_con, "pur_join") %>%
                 dplyr::filter(CHROM %in% chrom_names) %>%
-                dplyr::collect() %>% mutate(plat1_group = ifelse(plat1 < 0.99, "low","high"),
-                                            plat2_group = ifelse(plat2 < 0.99, "low","high"),
-                                            pur_group = paste(plat1_group, plat2_group, sep = "_"))
+                dplyr::collect() 
+pur_dat_id <- pur_dat %>% 
+                mutate(plat1_group = ifelse(plat1 < 0.99, "MiSeq-Low", "MiSeq-High")) %>% 
+                mutate(plat2_group = ifelse(plat2 < 0.99, "PGM-Low", "PGM-High")) %>% 
+                mutate(pur_group = paste(plat1_group, plat2_group, sep = " "))
+
 pur_dat_id_filt <- pur_dat_id %>%
     dplyr::filter((plat1 < 0.99 | plat2 < 0.99))
 ```
 
 ### Purity Scatter Plot Colored
 ```{r}
-min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) #%>% round(digits = 1)
-ggplot2::ggplot(pur_dat_id, ggplot2::aes(x = plat1, y = plat2)) +
-    ggplot2::geom_point(data = pur_dat_id_filt, ggplot2::aes(x = plat1, y = plat2, color = pur_group),
+min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
+ggplot2::ggplot(pur_dat_id_filt) +
+    ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
     ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1)
@@ -69,7 +60,7 @@ ggplot2::ggplot(pur_dat_id, ggplot2::aes(x = plat1, y = plat2)) +
 
 ### Group Summary Table
 ```{r}
-pur_dat_id %>% group_by(pur_group) %>% summarize(count = n()) %>% kable()
+pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable()
 ```
 
 
@@ -79,7 +70,8 @@ pgm_datasets <- dplyr::tbl(db_con, "cb_pgm") %>%
                 select(SAMPLE) %>% collect() %>% 
                 unique() %>% .$SAMPLE
 cb_pgm_metrics <- dplyr::tbl(db_con, "cb_pgm") %>%
-    dplyr::filter(CHROM %in% chrom_names, SAMPLE == pgm_datasets[1]) %>%         
+    dplyr::filter(CHROM %in% chrom_names, 
+                  SAMPLE == pgm_datasets[1], INDEL == 0) %>%  
     dplyr::select(CHROM, POS, RPB, MQB, BQB, MQSB, MQ0F) %>%
     dplyr::mutate(PLAT = "pgm") %>% 
     collect() %>%
@@ -93,9 +85,9 @@ miseq_datasets <- dplyr::tbl(db_con, "cb_miseq") %>%
                 unique() %>% .$SAMPLE
 
 cb_miseq_metrics <- dplyr::tbl(db_con, "cb_miseq") %>%
-    dplyr::filter(CHROM %in% chrom_names, SAMPLE == miseq_datasets[1]) %>%         
+    dplyr::filter(CHROM %in% chrom_names, SAMPLE == miseq_datasets[1]) %>%        
     dplyr::select(CHROM, POS, RPB, MQB, BQB, MQSB, MQ0F) %>%
-    dplyr::mutate(PLAT = "pgm") %>% 
+    dplyr::mutate(PLAT = "miseq") %>% 
     collect() %>%
     tidyr::gather("metric","value",3:7) %>% 
     group_by(metric)  %>% 
@@ -107,27 +99,12 @@ cb_miseq_metrics <- dplyr::tbl(db_con, "cb_miseq") %>%
 ```{r}
 ggplot(cb_pgm_metrics) + 
         geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
-        theme_bw() + ggtitle("PGM Metrics Bin Values")
+        theme_bw() + ggtitle("PGM Metric Bin Values")
 ggplot(cb_miseq_metrics) + 
     geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
     theme_bw() + ggtitle("MiSeq Metrics Bin Values")
 ```
 
-
-### Correlating Purity ID and metric bins
-```{r}
-
-low_pur_pos <- pur_dat_id_filt$POS
-cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
-                        filter(POS %in% low_pur_pos) %>% 
-                        ungroup() %>% 
-                        mutate(metric = paste("pgm", metric, sep = "_"))
-
-cb_miseq_metrics_bin <- cb_miseq_metrics %>% 
-                            ungroup() %>% 
-                            mutate(metric = paste("miseq", metric, sep = "_"))
-
-```
 
 ## Metric Descriptions
 Metrics Descriptions are from the vcf file header
@@ -141,6 +118,33 @@ MQSB
 : "Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)"
 MQ0F
 : "Fraction of MQ0 reads (smaller is better)"
+
+### Correlating Purity ID and metric bins
+```{r}
+low_pur_pos <- pur_dat_id_filt$POS
+cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
+                        filter(POS %in% low_pur_pos) %>% 
+                        ungroup() %>% 
+                        mutate(metric = paste(PLAT, metric, sep = "_"))
+                            
+cb_miseq_metrics_bin <- cb_miseq_metrics %>% 
+                            filter(POS %in% low_pur_pos) %>% 
+                            ungroup() %>% 
+                            mutate(metric = paste(PLAT, metric, sep = "_"))
+```
+
+```{r}
+cb_pgm_metrics_bin %>% 
+            filter(metric == "pgm_RPB") %>% 
+            select(-PLAT, -value, -metric) %>% 
+            rename(pgm_RPB = bin)
+            
+RPB_miseq <- cb_miseq_metrics_bin %>% 
+                filter(metric == "miseq_RPB") %>% 
+                select(-PLAT, -value, -metric) %>% 
+                rename(miseq_RPB = bin)
+pur_RPB_bin <- left_join(pur_dat_id_filt, RPB_pgm) %>% left_join(RPB_miseq)
+```
 
 ## Comparison plots
 ```{r}
@@ -162,14 +166,22 @@ ggplot(pur_RPB_bin) +
                         alpha = 0.5) +
     ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
     ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) +
-    facet_grid(miseq_RPB~pgm_RPB) +
-    ggtitle("RPB")
+    facet_wrap(~pgm_RPB, ncol = 1) +
+    ggtitle("PGM binning RPB")
+
+ggplot(pur_RPB_bin) + geom_bar(aes(x = as.factor(pgm_RPB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("RPB PGM Bins")
 ```
 
 Appears as though low RPB is correlated with low purity values. 
 
 ```{r}
-ggplot(pur_RPB_bin) + geom_bar(aes(x = as.factor(pgm_RPB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("RPB PGM Bins")
+ggplot(pur_RPB_bin) +     
+    ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
+                        alpha = 0.5) +
+    ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1) +
+    facet_wrap(~pgm_RPB, ncol = 1) +
+    ggtitle("MiSeq binning RPB")
 ggplot(pur_RPB_bin) + geom_bar(aes(x = as.factor(miseq_RPB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("RPB MiSeq Bins")
 ```
 
@@ -201,7 +213,7 @@ ggplot(pur_MQSB_bin) +
 
 ```{r}
 ggplot(pur_dat_id_metric_bin) + geom_bar(aes(x = as.factor(pgm_MQSB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("MQSB PGM Bins")
-ggplot(pur_dat_id_metric_bin) + geom_bar(aes(x = as.fac  tor(miseq_MQSB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("MQSB MiSeq Bins")
+ggplot(pur_dat_id_metric_bin) + geom_bar(aes(x = as.factor(miseq_MQSB))) + facet_wrap(~pur_group, scale = "free_y", ncol = 1) + theme_bw() + ggtitle("MQSB MiSeq Bins")
 ```
 
 
