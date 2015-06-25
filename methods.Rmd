@@ -1,10 +1,14 @@
 ---
-output: 
-  html_document: 
+bibliography: pepr-pub.bib
+output:
+  word_document: default
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+  html_document:
     fig_caption: yes
     keep_md: yes
     number_sections: yes
-bibliography: pepr-pub.bib
 ---
 # Methods
 ## Pipeline for Evaluating Prokaryotic References: PEPR
