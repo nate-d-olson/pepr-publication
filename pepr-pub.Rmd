@@ -1,11 +1,20 @@
 ---
-title: "PEPR: Pipeline for Evaluating Prokaryotic References"
-author: "Nate Olson"
-date: "June 15, 2015"
-output: html_document
+title: 'PEPR: Pipeline for Evaluating Prokaryotic References'
+output:
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+  html_document:
+    fig_caption: yes
+    keep_md: yes
+    number_sections: yes
+  word_document: default
+bibliography: pepr-pub.bib
 ---
+
 Figure and table numbering 
 http://www.r-bloggers.com/writing-papers-using-r-markdown/
+
 ## Authors
 Nathan D. Olson
 Justin Zook
@@ -15,15 +24,107 @@ Marc L. Salit
 ## Abstract
 
 ## Introduction
+* General background - painting the picture
+    * Advances in genome sequencing 
+    * Genome sequencing applications
+* Genome sequencing as a measurement process
+    * for each step briefly describe known sources of bias and error
+    * sample preparation
+    * reaction monitoring
+    * computational analysis
+    * Complex measurement process requiring controls
+    * New maturing field, unknown sources of bias and error.  Use of homogeneous and stable reference materials can be used in benchmarking.  Help to identify and characterize currently unknown sources of bias and error.
+    
+* Whole genome sequencing controls
+    * Needed to validate measurement process
+    * Microbial sequencing control material for regular QC, small scale relative to human genome material 
+    * NIST developing RMs to meet this need
+    * Brief description of micro RMs and approach to characterization
+        * RM characterization 
+            * homogeneity, stability, purity
+            * genome assembly
+            * base level analysis
+            * genomic purity
+        * Characterization philosophy
+            * maturing field - basic research still needed to be able to quantify and define confidence in a genome sequence
+            * use of replicates and orthogonal measurements
+            * providing genome sequence and characterization results allow users to investigate questionable regions and positions positions 
+    
+* Also need for application specific materials
+    * Sequencing manufacturers - material with characteristics that best challenge their platforms limitations
+    * Application areas - validation of methods for detection and characterization of specific pathogens
+    * Different genome contexts
+    * Limited resources to create RMs, 
+        * user characterized materials
+        * help to identify other sources of bias and error for genome context not found in NIST RMs
+    * Sequencing centers and platform manufactures already using material for QC
+    
+
+    NIST RM characterization pipeline was developed so that users can characterize material they are currently using as part of a mature quality control system.  Application of the pipeline increases the confidence in the quality control system through better characterization of the control material.  Here we present a Pipeline for Evaluating Prokaryotic References "PEPR" and preliminary results from the characterization of the first of four microbial reference materials using the pipeline.
+
 
 ## Methods
+# Methods
+## Pipeline for Evaluating Prokaryotic References: PEPR
+Pipeline for Evaluating Prokaryotic Reference (PEPR) consists of three bioinformatic pipelines written in python.  The three bioinformatic pipelines are Genome Evaluation, Genome Characterization, and Genomic Purity.  Bioinformatic pipeline inputs defined with a yaml file.  The individual pipeline coordinates the execution of a number of commandline tools, ogging the standard output and standard error for each step in the pipeline  in time stamped files for later inspection and debugging. Pipeline code avaiable at [github.com/nate-d-olson/pepr](https://github.com/nate-d-olson/pepr). To reduce the barrier for reuse two Docker (https://www.docker.com/) containers are available with pipeline dependencies pre-installed excluding the Genome Analysis Toolkit (due to licensing restrictions). Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system. The pepr container (https://registry.hub.docker.com/u/natedolson/pepr/) includes dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository. The docker-pathoscope (https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) has dependencies for the genomic purity pipeline installed.
+    A software package peprr [github.com/nate-d-olson/peprr](github https://github.com/nate-d-olson/peprr) was developed for the statistical computing languge R to compile the output from the genome evaluation, characterization, and genomic purity pipelines [@R2015]. The compiled data was manipulated into a series of data tables within an sqlite database to facilitate analysis [@wickham2014tidy].  Functions to generate a number of summary tables and figures, including those in this publication are included in the package.
+
+## Pipeline Specific Methods
+### Genome Evaluation Pipeline
+The Genome Evaluation pipeline is the first step in the PEPR workflow and uses whole genome sequencing data to evaluate and correct misasseblies in the reference genome. Sequencing data are first retrieved from the Genbank Sequence Read Archive (SRA) using the sratoolkit fastq-dump [http://ncbi.github.io/sra-tools/](http://ncbi.github.io/sra-tools/). The sequencing reads are then mapped to the reference genome using bwa (MiSeq and PacBio)[@Li2013c] and tmap [@Homer]. Finally Pilon was used to evaluate and polish the reference assembly assembly [@Walker2014].  The revised reference genome is then further characterized in the Genome Characterization Pipeline.
+
+### Genome Characterization Pipeline
+The Genome Characterication Pipeline uses replicate sequence datasets from multiple sequencing platforms for evaluate the reference genome on a individual base level. Seqeuncing data is aligned to the reference genome using the same methods as the Genome Evaluation pipeline. Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates [http://broadinstitute.github.io/picard](http://broadinstitute.github.io/picard), realignment around indels with the GenomeAnalysisToolKit [@McKenna2010; @DePristo12011]. The base level summary statistics are calculated using SAMtools mpileup [@Li2009].  Homogeneity analysis, measure of the similarity of the genomic content between replicate samples, was performed by first generating a pileup file for each dataset then performing pairwise tumor-normal variant calling using Varscan [@Koboldt2009]. Additionally, a number of summary statistics are caclulated for the sequencing datasets and alignment files, using fastqc (http://www.bioinformatics.babraham.ac.uk/projects/fastqc/)[http://www.bioinformatics.babraham.ac.uk/projects/fastqc/] and Picard Collect Multiple Metrics [http://broadinstitute.github.io/picard](http://broadinstitute.github.io/picard) respectively.  
+
+### Genomic Purity Pipeline
+The purity of the genomic material in terms of presense of DNA from sources other than the expected strain was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 [@Hong2014].  This method uses an expectation maximization algorithm where the sequence data are first mapped to a database comprised on all sequence data in the Genbank nt database, then through an iterative process re-assigns ambiguously mapped reads to based on the proportion of reads mapped unambigously to individual taxa in the database. The PathoScope 2.0 taxonomic read classification pipeline includes an initial read filtering step (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 [@Langmead2012]), then an expectation-maximization classification algorithm (PathoID).  The annotated Genbank nt database provided by the PathoScope developers was used as the reference database ([ftp://pathoscope.bumc.bu.edu/data/nt_ti.fa.gz](ftp://pathoscope.bumc.bu.edu/data/nt_ti.fa.gz)). 
+    
+## _S. aureus_ Sequencing
+### Material
+RM8376 is extracted genomic DNA from _Staphylococcus areus_ strain NRS100 isolate COL (Biosample SAMN02854573).  The strain was selected based on public health relevance and it's low %GC.  The strain was selected for use by the FDA and isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075).  The strain is resistant to the antibiotics oxacillin and tetracycline.
+
+A single colony was obtained from the initial culture stab after an overnight incubation at 37°C on an plate. A single colony was used to innoculate a new plate. One colony from the new plate was grown in 20 mL LB at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. Glycerol freezes were made from the remaining stock. DNA and agarose plugs were made from the 15 x 150 mm plates. DNA was isolated by lysing the bacteria in lysis Solution containing NaCl, Tris, EDTA and lysostaphin (25 µ g/ml) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol. Drained, then dissolved in TE (Tris 10 mM, EDTA 0.1 mM, pH8.0).
+
+### Experimental Design
+The _S. aureus_ candidate reference materials were sequenced using three orthogonal sequences methods. Long read sequencing using PacBio, __TODO__ Library prep and sequencing methods __TODO__.  Eight replicate vials were randomly sampled from the lot of 1500 vials and sequenced using two short read sequencing technologies, Ion Torrent PGM, and Illumina MiSeq. Technical replicate sequencing libraries were prepared for each of the eight vials using the Nextera library prep kit with 2 X 300 bp reads.  The 16 libraries were pooled and sequencing in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using __TODO__ library prep and sequencing methods __TODO__. The raw sequence data is archived at the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see __TABLE SEQ INFO__ for accession numbers. 
+
+## Reference assembly
+PacBio long read data was used to generate the reference genome assembly used as input with the Genome Evaluation Pipeline. PacBio Reads wereassembled using HGAP assembler - version __TODO__ [@Koren2013].  The _de novo_ assembly was validated using OpGen optical mapping data.  Agarose plugs generated from the same culture stock as that used to generate the DNA reference material was used for optical mapping measurement.  Restriction enzyme NcoI was used for the restriction digest.
 
 ## Results
+__TODO Pipeline diagram TODO__
+
+__In seperate document__
 
 ## Discussion
+### General Pipeline information
+* Run time and system requirements
+    * Pipeline is not optimized for runtime or storage
+    * plans to add parallelization and restart functionality using ruffus
 
-PGM read length
-The shorter read length is potentially due to the low GC content, but further analysis is required to confirm this hypothesis.
+### Sequencing
+* The shorter read length is potentially due to the low GC content, but further analysis is required to confirm this hypothesis.
+
+### Genome assembly
+* Optical mapping and short read data support the assembly
+* assembly represents the consensus genome for the population
+* the pipeline does not attempt to identify or characterize low frequency structural variants within the population of cells which the DNA was extracted from
+
+### Base level analysis
+* X% of positions > 99% purity for both platforms, and all positions > X% purity for at least one of the two short read technologies.
+* Initial analysis of bias metric values in relation to purity values for the two short read platforms unable to identify position with levels of biological variablility as the individual base level
+* Use of additional metrics and algorithms developed for the identification of low frequency variants, such as lowfreq.  Can help identify positions with low levels of biological variability.
+* High purity values and material homogeneity
+
+### Genomic Purity
+* Low levels of contaminants for the materials
+* Identified contaminants most likely from reagents and not material itself
+    * difference is contaminant abundance and profile between the short read platforms supports this conclusion
+* Contaminants - previously identified as common reagent contaminants
+
+## Conclusions
+* Pipeline provides an initial framework for chracterizing microbial genomic reference materials.
+* As the field matures and understanding of the measurement process, new algorithms can be incorporated into the pipeline increasing the quality of material characterization results.
 
 ## References
 
