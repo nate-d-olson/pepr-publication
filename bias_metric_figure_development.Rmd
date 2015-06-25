@@ -1,7 +1,7 @@
 ---
 title: "Development of bias metric figures"
 author: "Nate Olson"
-date: "June 23, 2015"
+date: "June 24, 2015"
 output: html_document
 ---
 ## Background
@@ -37,15 +37,16 @@ pur_dat <- dplyr::tbl(db_con, "pur_join") %>%
                 dplyr::filter(CHROM %in% chrom_names) %>%
                 dplyr::collect() 
 pur_dat_id <- pur_dat %>% 
-                mutate(plat1_group = ifelse(plat1 < 0.99, "MiSeq-Low", "MiSeq-High")) %>% 
-                mutate(plat2_group = ifelse(plat2 < 0.99, "PGM-Low", "PGM-High")) %>% 
+                mutate(plat1_group = ifelse(plat1 < 0.98, "MiSeq-Low", "MiSeq-High")) %>% 
+                mutate(plat2_group = ifelse(plat2 < 0.98, "PGM-Low", "PGM-High")) %>% 
                 mutate(pur_group = paste(plat1_group, plat2_group, sep = " "))
 
 pur_dat_id_filt <- pur_dat_id %>%
-    dplyr::filter((plat1 < 0.99 | plat2 < 0.99))
+    dplyr::filter((plat1 < 0.98 | plat2 < 0.98))
 ```
 
 ### Purity Scatter Plot Colored
+Positions with low purity for only one of the two platforms indicate a potential bias in the one low purity platform.  Where as positions with low purity values for both platforms more likely indicate true biological variability.
 ```{r cache=TRUE}
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 ggplot2::ggplot(pur_dat_id_filt) +
@@ -55,26 +56,47 @@ ggplot2::ggplot(pur_dat_id_filt) +
     ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1)
 ```
 
-
-
 ### Summary Table
-Position abundance for each of the four groups
+Position abundance for each of the four groups.  The majority of the genome positions have purity values > 0.98 for both platforms.
 ```{r}
 pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable()
+```
+
+
+
+### Genome Position
+Looking for low purity hot spots.
+
+#### Chromosome
+```{r}
+ggplot(pur_dat_id_filt %>% 
+           filter(CHROM == "unitig_0|quiver|quiver|quiver|pilon")) + 
+            geom_bar(aes(x = POS, fill = pur_group)) + 
+            facet_wrap(~pur_group, ncol = 1, scales = "free") + theme_bw()
+```
+
+Low PGM and High MiSeq purity positions are uniformly distributed across the genome.  Therefore the majority of the low purity values are not likely due to a genome region specific bias, such as repeats or GC content.  Potentially due to homopolymers but additional analysis is required to confirm this hypothesis.  Positions with low Miseq purity values and both low and high PGM values are concentrated in three regions of the genome indicating the potential for the genome region specific bias. 
+
+#### Plasmind
+```{r}
+ggplot(pur_dat_id_filt %>% 
+           filter(CHROM == "unitig_1|quiver|quiver|quiver|pilon")) + 
+            geom_bar(aes(x = POS, fill = pur_group)) + 
+            facet_wrap(~pur_group, ncol = 1, scales = "free") + theme_bw()
 ```
 
 ## Metric Descriptions
 Five metrics, read position bias, mapping quality bias, base quality bias, and mapping quality vs. strand bias were user to characterize the four groups. 
 
 ### Descriptions from the vcf file header
-__RPB__: "Mann-Whitney U test of Read Position Bias (bigger is better)"
-__MQB__: "Mann-Whitney U test of Mapping Quality Bias (bigger is better)"
-__BQB__: "Mann-Whitney U test of Base Quality Bias (bigger is better)"
-__MQSB__: "Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)"
-__MQ0F__: "Fraction of MQ0 reads (smaller is better)"
+__RPB__: "Mann-Whitney U test of Read Position Bias (bigger is better)"  
+__MQB__: "Mann-Whitney U test of Mapping Quality Bias (bigger is better)"  
+__BQB__: "Mann-Whitney U test of Base Quality Bias (bigger is better)"  
+__MQSB__: "Mann-Whitney U test of Mapping Quality vs Strand Bias (bigger is better)"  
+__MQ0F__: "Fraction of MQ0 reads (smaller is better)"  
 
 ## Binning metrics values
-Values for each metric were bined into 10 equal sized bins.
+Values for each metric were split into 10 equal size bins (same number of genome positions.)
 ```{r cache=TRUE}
 pgm_datasets <- dplyr::tbl(db_con, "cb_pgm") %>% 
                 select(SAMPLE) %>% collect() %>% 
@@ -88,18 +110,21 @@ cb_pgm_metrics <- dplyr::tbl(db_con, "cb_pgm") %>%
     tidyr::gather("metric","value",3:7) %>% 
     group_by(metric)  %>% 
     filter(!is.na(value)) %>% 
-    mutate(bin = ntile(value, n = 10))
+    mutate(bin = ntile(value, n = 20))
 ```
 
 ### Bin metric value distribution
 ```{r cache=TRUE}
 ggplot(cb_pgm_metrics) + 
         geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
-        theme_bw() + ggtitle("PGM Metric Bin Values")
+        theme_bw() + labs(title = "PGM Metrics Bin Values", x = "Bin")
 ```
+
+Long tailed distributions for the purity values, may need to split into more bins, then group bins about a specific threshold.
 
 ## Evaluating PGM Bias metrics
 ```{r cache=TRUE}
+## 20 bins
 low_pur_pos <- pur_dat_id_filt$POS
 cb_pgm_metrics_bin <- cb_pgm_metrics %>% 
                         filter(POS %in% low_pur_pos) %>% 
@@ -112,6 +137,7 @@ pur_pgm_bin <- left_join(pur_dat_id_filt, cb_pgm_metrics_bin)
 
 
 ```{r cache=TRUE}
+# 20 bins
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 ggplot(pur_pgm_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
@@ -123,7 +149,9 @@ ggplot(pur_pgm_bin) +
 ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_BQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "BQB PGM Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_pgm_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -133,7 +161,9 @@ ggplot(pur_pgm_bin) +
 ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_MQ0F))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQ0F PGM Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_pgm_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -143,7 +173,9 @@ ggplot(pur_pgm_bin) +
 ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_MQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQB PGM Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_pgm_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -153,7 +185,9 @@ ggplot(pur_pgm_bin) +
 ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_MQSB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQSB PGM Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_pgm_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -167,6 +201,7 @@ ggplot(pur_pgm_bin) + geom_bar(aes(x = as.factor(pgm_RPB))) +
 
 ## Evaluating Miseq Bias
 ```{r cache=TRUE}
+## 20 bins
 low_pur_pos <- pur_dat_id_filt$POS
 miseq_datasets <- dplyr::tbl(db_con, "cb_miseq") %>% 
                 select(SAMPLE) %>% collect() %>% 
@@ -181,7 +216,7 @@ cb_miseq_metrics <- dplyr::tbl(db_con, "cb_miseq") %>%
     tidyr::gather("metric","value",3:7) %>% 
     group_by(metric)  %>% 
     filter(!is.na(value)) %>% 
-    mutate(bin = ntile(value, n = 10))
+    mutate(bin = ntile(value, n = 20))
 ```
 
 ```{r cache = TRUE}
@@ -199,10 +234,11 @@ pur_miseq_bin <- left_join(pur_dat_id_filt, cb_miseq_metrics_bin)
 ```{r}
 ggplot(cb_miseq_metrics) + 
     geom_boxplot(aes(x = as.factor(bin), y = value, color = metric)) + 
-    theme_bw() + ggtitle("MiSeq Metrics Bin Values")
+    theme_bw() + labs(title = "MiSeq Metrics Bin Values", x = "Bin")
 ```
 
 ```{r cache=TRUE}
+## 20 bins
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 ggplot(pur_miseq_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
@@ -214,7 +250,9 @@ ggplot(pur_miseq_bin) +
 ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_BQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "BQB MiSeq Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_miseq_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -224,7 +262,9 @@ ggplot(pur_miseq_bin) +
 ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQ0F))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQ0F MiSeq Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_miseq_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -234,7 +274,9 @@ ggplot(pur_miseq_bin) +
 ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQB MiSeq Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_miseq_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -244,7 +286,9 @@ ggplot(pur_miseq_bin) +
 ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_MQSB))) +
     facet_wrap(~pur_group, scale = "free_y", ncol = 1) + 
     theme_bw() + labs(title = "MQSB MiSeq Bins", x = "Bin")
+```
 
+```{r cache=TRUE}
 ggplot(pur_miseq_bin) + 
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -256,6 +300,7 @@ ggplot(pur_miseq_bin) + geom_bar(aes(x = as.factor(miseq_RPB))) +
     theme_bw() + labs(title = "RPB MiSeq Bins", x = "Bin")
 ```
 
+Similarity in bias metrics for low MiSeq purity positions with low and high PGM purity values indicates the potential that despite the lower purity for both platforms. The low purity values are the result of biases and not true biological variability.
 
 ```{r}
 sessionInfo()
