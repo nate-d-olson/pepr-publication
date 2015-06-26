@@ -5,3 +5,10 @@ packrat/src
 *.md
 *html
 packrat/src/
+
+## ignoring cache - too large for github
+*cache
+
+## Ignoring compiled documents
+*docx
+*pdf
