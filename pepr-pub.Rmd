@@ -111,8 +111,8 @@ __In seperate document__
 * the pipeline does not attempt to identify or characterize low frequency structural variants within the population of cells which the DNA was extracted from
 
 ### Base level analysis
-* X% of positions > 99% purity for both platforms, and all positions > X% purity for at least one of the two short read technologies.
-* Initial analysis of bias metric values in relation to purity values for the two short read platforms unable to identify position with levels of biological variablility as the individual base level
+* It is also important to acknowledge that the two platforms in agreement are susceptible to the same bias and thus the outlier platform could indicate the true value.  The sequencing technology used to chracterize the material is still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
+* A number of base levels metrics, such as strain bias, are calculated as part of the PEPR pipeline and are included in the pipeline results database, and can be used to differentiate positions with low purity due to measurement error and thoes due to biological variability.
 * Use of additional metrics and algorithms developed for the identification of low frequency variants, such as lowfreq.  Can help identify positions with low levels of biological variability.
 * High purity values and material homogeneity
 
