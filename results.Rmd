@@ -1,7 +1,6 @@
 ---
 bibliography: pepr-pub.bib
 output:
-  word_document: default
   pdf_document:
     fig_caption: yes
     number_sections: yes
@@ -9,10 +8,8 @@ output:
     fig_caption: yes
     keep_md: yes
     number_sections: yes
+  word_document: default
 ---
-```{r, echo = FALSE, message = FALSE}
-source("rm_metadata.R")
-```
 
 ```{r, echo = FALSE, message=FALSE}
 library(png)
@@ -20,6 +17,8 @@ library(grid)
 library(peprr)
 library(dplyr)
 library(knitr)
+source("rm_metadata.R")
+source("calc_results_values.R")
 ```
 
 ```{r echo=FALSE, message=FALSE} 
@@ -28,7 +27,7 @@ peprDB <- dplyr::src_sqlite(db_path)
 
 # Results
 ## Summary of Sequencing Datasets
-The MiSeq sequencing run resulted in over 1.5 million pair end (3 million total) reads per library with a median read length just under 250 bp.  Whereas the PGM sequencing run produced about 0.5 million reads per library with a median read length around 235 bp.  The higher throughput and paried end reads resulted in a higher per library coverage for MiSeq compared to PGM (~140X vs. ~30X).  Despite using the 400bp sequencing chemistry the PGM median read length was less than 250 bp.  The three PacBio datasets are technical sequencing replicates (SMRT cells) from the same sequencing library, with a median read lengths of XYZ, and throughput of XYZ, resulting in a total of ??X coverage.
+The number of reads, read, length, insert size for paired-end datasets as well as coverage for _S. aureus_ datasets, presented in Table 1, was generated from the database using the `seq_summary_table(peprDB)` command in the peprr package.  The MiSeq sequencing run resulted in over 1.5 million pair end (3 million total) reads per library with a median read length just under 250 bp.  Whereas the PGM sequencing run produced about 0.5 million reads per library with a median read length around 235 bp.  The higher throughput and paried end reads resulted in a higher per library coverage for MiSeq compared to PGM (~140X vs. ~30X).  Despite using the 400bp sequencing chemistry the PGM median read length was less than 250 bp.  The three PacBio datasets are technical sequencing replicates (SMRT cells) from the same sequencing library, with a median read lengths of XYZ, and throughput of XYZ, resulting in a total of ??X coverage.
 
 ```{r echo = FALSE, message=FALSE, warning=FALSE}
 kable(seq_summary_table(peprDB), 
@@ -47,7 +46,7 @@ The short read sequencing data supported the _de novo_ genome assembly. Pilon, a
 
 ## Base Level Analysis
 ### Base Purity
-A base purity metric was used for base level analysis.  The purity value is the number bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  Comparison of the purity values between for all positions in the genome for two orthogonal sequencing methods was used to differentiate between positions with low purity values due to platform specific biases and those due to true biological diversity.  Out of `r rm_genome_size` bases in the genome `r pos_pur_gt99_both` positions had purity values greater than 99\% for both short read sequencing platforms.  `r pos_pur_gt99_one` and `r pos_pur_gt95_one` positions with purity values greater than 99% and 95% for one of the two platforms.  All postions had a purity value greater than `r min_max_pur_position` for at least one of the two platforms. Positions with the low purity values for one platform and not another indicate a potential platform specific bias.  The positions with low purity for MiSeq were non-uniformly distributed where as positions with low purity for PGM were unifromly distributed (Fig GenomePurityCoord).  The reference base is identified using a third orthogonal sequencing method (PacBio) and thus a low value for one of the two short reads sequencing platforms represents agreement between two of the three sequencing methods.  
+A base purity metric was used for base level analysis.  The purity value is the number bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  Comparison of the purity values between for all positions in the genome for two orthogonal sequencing methods was used to differentiate between positions with low purity values due to platform specific biases and those due to true biological diversity.  Out of $`r rm_genome_size/1000000`\times 10^6$ positions in the genome `r pos_pur_gt99_both` positions had purity values greater than 99\% for both short read sequencing platforms.  `r pos_pur_gt99_one` and `r pos_pur_gt95_one` positions with purity values greater than 99% and 95% for one of the two platforms.  All postions had a purity value greater than `r min_max_pur_position` for at least one of the two platforms. Positions with the low purity values for one platform and not another indicate a potential platform specific bias.  The positions with low purity for MiSeq were non-uniformly distributed where as positions with low purity for PGM were unifromly distributed (Fig GenomePurityCoord).  The reference base is identified using a third orthogonal sequencing method (PacBio) and thus a low value for one of the two short reads sequencing platforms represents agreement between two of the three sequencing methods.  
 
 ```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE}
 source("base_purity_analysis.R")
