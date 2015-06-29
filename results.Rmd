@@ -55,7 +55,7 @@ source("base_purity_analysis.R")
 pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable(row.names = NA, caption = "Number of genome positions with purity values higher and lower than 0.99 for MiSeq and PGM sequencing platforms.")
 ```
 
-```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "Comparison of base purity values for PGM and MiSeq. Positions are colored based of high and low purity values for the two sequencing platforms."}
+```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "_Comparison of base purity values for PGM and MiSeq._ Positions are colored based of high and low purity values for the two sequencing platforms."}
 ggplot2::ggplot(pur_dat_id_filt) +
     ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                         alpha = 0.5) +
@@ -63,7 +63,7 @@ ggplot2::ggplot(pur_dat_id_filt) +
     ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1)
 ```
 
-```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "Position of bases with low purity for one or both of the two short read sequencing platforms."}
+```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "_Position of bases with low purity for one or both of the two short read sequencing platforms._"}
 ggplot(pur_dat_id_filt %>% filter(CHROM == chrom_names[1])) + 
     geom_bar(aes(x = POS, fill = pur_group)) + 
     facet_wrap(~pur_group, ncol = 1, scales = "free_y") + theme_bw()
