@@ -12,18 +12,30 @@ output:
 bibliography: pepr-pub.bib
 ---
 
-Figure and table numbering 
-http://www.r-bloggers.com/writing-papers-using-r-markdown/
+```{r, echo = FALSE, message=FALSE}
+library(png)
+library(grid)
+library(peprr)
+library(dplyr)
+library(knitr)
+source("rm_metadata.R")
+source("calc_results_values.R")
 
-## Authors
+# Figure and table numbering 
+# http://www.r-bloggers.com/writing-papers-using-r-markdown/
+    
+```
+
+
+# Authors
 Nathan D. Olson
 Justin Zook
 Scott A. Jackson
 Marc L. Salit
 
-## Abstract
+# Abstract
 
-## Introduction
+# Introduction
 * General background - painting the picture
     * Advances in genome sequencing 
     * Genome sequencing applications
@@ -62,12 +74,11 @@ Marc L. Salit
 
     NIST RM characterization pipeline was developed so that users can characterize material they are currently using as part of a mature quality control system.  Application of the pipeline increases the confidence in the quality control system through better characterization of the control material.  Here we present a Pipeline for Evaluating Prokaryotic References "PEPR" and preliminary results from the characterization of the first of four microbial reference materials using the pipeline.
 
-
-## Methods
 # Methods
 ## Pipeline for Evaluating Prokaryotic References: PEPR
 Pipeline for Evaluating Prokaryotic Reference (PEPR) consists of three bioinformatic pipelines written in python.  The three bioinformatic pipelines are Genome Evaluation, Genome Characterization, and Genomic Purity.  Bioinformatic pipeline inputs defined with a yaml file.  The individual pipeline coordinates the execution of a number of commandline tools, ogging the standard output and standard error for each step in the pipeline  in time stamped files for later inspection and debugging. Pipeline code avaiable at [github.com/nate-d-olson/pepr](https://github.com/nate-d-olson/pepr). To reduce the barrier for reuse two Docker (https://www.docker.com/) containers are available with pipeline dependencies pre-installed excluding the Genome Analysis Toolkit (due to licensing restrictions). Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system. The pepr container (https://registry.hub.docker.com/u/natedolson/pepr/) includes dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository. The docker-pathoscope (https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) has dependencies for the genomic purity pipeline installed.
-    A software package peprr [github.com/nate-d-olson/peprr](github https://github.com/nate-d-olson/peprr) was developed for the statistical computing languge R to compile the output from the genome evaluation, characterization, and genomic purity pipelines [@R2015]. The compiled data was manipulated into a series of data tables within an sqlite database to facilitate analysis [@wickham2014tidy].  Functions to generate a number of summary tables and figures, including those in this publication are included in the package.
+
+A software package peprr [github.com/nate-d-olson/peprr](github https://github.com/nate-d-olson/peprr) was developed for the statistical computing languge R to compile the output from the genome evaluation, characterization, and genomic purity pipelines [@R2015]. The compiled data was manipulated into a series of data tables within an sqlite database to facilitate analysis [@wickham2014tidy].  Functions to generate a number of summary tables and figures, including those in this publication are included in the package.
 
 ## Pipeline Specific Methods
 ### Genome Evaluation Pipeline
@@ -91,40 +102,43 @@ The _S. aureus_ candidate reference materials were sequenced using three orthogo
 ## Reference assembly
 PacBio long read data was used to generate the reference genome assembly used as input with the Genome Evaluation Pipeline. PacBio Reads wereassembled using HGAP assembler - version __TODO__ [@Koren2013].  The _de novo_ assembly was validated using OpGen optical mapping data.  Agarose plugs generated from the same culture stock as that used to generate the DNA reference material was used for optical mapping measurement.  Restriction enzyme NcoI was used for the restriction digest.
 
-## Results
+# Results
 __TODO Pipeline diagram TODO__
 
 __In seperate document__
 
-## Discussion
-### General Pipeline information
+# Discussion
+## General Pipeline information
 * Run time and system requirements
     * Pipeline is not optimized for runtime or storage
     * plans to add parallelization and restart functionality using ruffus
 
-### Sequencing
-* The shorter read length is potentially due to the low GC content, but further analysis is required to confirm this hypothesis.
+## Sequencing
+The PEPR database includes a number of summary statistics for the sequencing datasets processed.  Sequencing dataset throughput and read length were as expected based on the library prep and sequencing methods used excluding the PGM datasets.  The 400 bp sequencing and library prepartion methods yielded median read lengths of `r pgm_med_read_length`. The shorter read length is potentially due to the low GC content is most likely due to low GC content is known to challenge current sequencing technologies sequencing [@Quail2012].  
+__TODO Summary statement about min coverage TODO__
 
-### Genome assembly
-* Optical mapping and short read data support the assembly
-* assembly represents the consensus genome for the population
-* the pipeline does not attempt to identify or characterize low frequency structural variants within the population of cells which the DNA was extracted from
+## Genome assembly
+A closed reference genome assembly is required as input for the PEPR pipeline.  A closed candidate reference genome was assembled using PacBio long read data.  To assess accuracy of the reference genome whole genome mapping data generated with the OpGen optical mapping technology, an orthogonal measurement method, was used to evaluate the genome assembly. Optical mapping results were used to assess the overall structure of the genome, its use of long DNA fragments (__TODO fragment size TODO__) allow for the evaluation of large misassemblies , > 3 kb, that are not easily identified using standard short read sequencing data.  Mate pairs, or other library prepartion methods developed such as bionanogenomics (??), represent orthogonal methods that can also be used to identify large misassemblies.  The reference was then used as input for the PEPR evaluation pipeline.  
 
-### Base level analysis
-* It is also important to acknowledge that the two platforms in agreement are susceptible to the same bias and thus the outlier platform could indicate the true value.  The sequencing technology used to chracterize the material is still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
-* A number of base levels metrics, such as strain bias, are calculated as part of the PEPR pipeline and are included in the pipeline results database, and can be used to differentiate positions with low purity due to measurement error and thoes due to biological variability.
-* Use of additional metrics and algorithms developed for the identification of low frequency variants, such as lowfreq.  Can help identify positions with low levels of biological variability.
-* High purity values and material homogeneity
+The evaluation step in the PEPR pipeline provides an automated method for evaluate and refine a reference genome.The evaluation pipeline takes a reference genome and uses the genome assembly polishing and assessment tool Pilon [@Walker2014].  Pilon was choosen for the genome evalaution step in the pipeline as it not only assesses the accuracy of the pipeline but also attempts to automatically correct errors in the assembly.  Other methods are available for evaluating reference genomes, e.g. amosvalidate [@Phillippy2008] and ALE [@Clark2013], however these methods only assess assembly accuracy and do not correct missassemblies.  To simplify the pipeline Pilon used as it evlauates accuracy and attempts to correct ambiguities. The agreement between the PacBio assembly, Optical Mapping data, and MiSeq Pilon analysis allows for increased confidence in the PacBio reference assembly.  The resulting reference assembly represents a consensus genome for the population of cells used to generate the material being characterized.  The pipeline does not attempt to identify or characterize low frequency structural variants within the material. Additionally, the pipeline was not developed to assess the homogeneity, vial-to-vial variability of the reference genome.  
 
-### Genomic Purity
-* Low levels of contaminants for the materials
-* Identified contaminants most likely from reagents and not material itself
-    * difference is contaminant abundance and profile between the short read platforms supports this conclusion
-* Contaminants - previously identified as common reagent contaminants
+## Base level analysis
+The PEPR evaluation pipeline validated reference genome is then used as input for the characterization pipeline which calculates base level statistics using replicate sequencing data from orthogonal measurement methods. To assess the purity of a genome position or base, sequencing data from the replicate datasets are pooled by sequecing platform.  Samtools mpileup is used to calculate the number of base calls at that support or disagree with the reference base.  The base call counts are used to calculate the base level purity.  Through comparison of the base purity for two orthogonal sequencing methods we are able to identify genome positions low bases with low purity values due to platform specific systematic sequencing errors.  It is also important to acknowledge that the two platforms in agreement are susceptible to the same bias and thus the outlier platform could indicate the true value.  The sequencing technology used to chracterize the material is still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
 
-## Conclusions
-* Pipeline provides an initial framework for chracterizing microbial genomic reference materials.
-* As the field matures and understanding of the measurement process, new algorithms can be incorporated into the pipeline increasing the quality of material characterization results.
+A number of base levels metrics, such as strain bias, are calculated as part of the PEPR pipeline and are included in the pipeline results database, and can be used to differentiate positions with low purity due to measurement error and thoes due to biological variability. Use of additional metrics and algorithms developed for the identification of low frequency variants, such as lowfreq.  Can help identify positions with low levels of biological variability.
 
-## References
+The PEPR characterization pipeline assess the homogeneity of a material through comparison of purity values between technical replicates.  The homogeneity analysis is performed using the varscan tumor-normal variant caller [@Koboldt2009].  Only MiSeq data was used to assess the homogeneity of the material as the higher coverage increased the statistical power of the test and the replicate libraries provide information regarding the method error rate.  No statistically significant variants were identified between all pair-wise comparisons indicating that the material is homogeneous.  __TODO text multiple tests p-value corrections TODO__
+
+## Genomic Purity
+The third component of PEPR is the `genomic_purity` purity pipeline.  This component of the pipeline is used to identify DNA within the material that belongs to a genus other than the material genus.  Genomic contamiants can be from the culture itself or reagents and materials used to prepare the material [@Shrestha2013; @Tang2003; @Salter2014].  Contaminants identified by the `genomic_purity` pipeline may not necessarily be present in the material for example reagents used to during library preparation may also include contaminants [@Tanner1998; @Newsome2004; @Motley2014; @Salter2014].  Bioinformatic errors may also lead to false positive contaminants, these are either due to errors in the database, due to sequence misclassification, or errors in the classification algorithm itself.  Genomic purity analysis of the _S. aureus_ material identified a number of canidate contaminants,  the most abundant of which was _E. coli_.  _E. coli_ a well documented contaminant of molecular biology reagents, and not likely a true contaminant [@Salter2014]. While, contaminants identified by the `genomic_purity` are most likely from reagents and due to bioinformatic errors, a conservative value the material genomic purity value assumes all contaminants are real.
+
+
+# Conclusions
+PEPR provides an initial framework for chracterizing microbial genomic reference materials. The objective is developing the PEPR was to provide a reproducible and transparent workflow for the characterization of prokaryotic genomic material.  The pipeline can be used to characterize reference materials as well as in-house quality control materials for which sequencing data from multiple platforms is available for replicates sample.  The resulting characterization values are intentially conservative and without uncertainty or confidence estimates as sources of bias and error associated with the meausrement process are currently not fully understood. As the scientific communities understanding of the measurement process matures new algorithms can be incorporated into the pipeline increasing the quality of material characterization results. 
+
+# Acknowlegements
+The author’s would like to thank Jenny McDaniel, Lindsay Vang, and David Catoe for performing the measurements. Tim Muruvanda for performing the PacBio sequencing. This work was supported by the Department of Homeland Security (DHS) Science and Technology Directorate under the Interagency Agreement HSHQPM-14-X-00078 with NIST and by two interagency agreements with the FDA. Opinions expressed in this paper are the authors’ and do not necessarily reflect the policies and views of the DHS, NIST, or affiliated venues. Certain commercial equipment, instruments, or materials are identified in this paper only to specify the experimental procedure adequately. Such identification is not intended to imply recommendation or endorsement by the NIST, nor is it intended to imply that the materials or equipment identified are necessarily the best available for the purpose.
+Official contribution of NIST; not subject to copyrights in USA.
+
+# References
 
