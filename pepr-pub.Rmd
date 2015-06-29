@@ -32,6 +32,16 @@ incCount <- function(inObj, useName) {
 }
 figCount <- c(`_` = 0)
 tableCount <- c(`_` = 0)
+
+pasteLabel <- function(preText, inObj, objName, insLink = TRUE) {
+    objNum <- inObj[objName]
+
+    useText <- paste(preText, objNum, sep = " ")
+    if (insLink) {
+        useText <- paste("[", useText, "](#", objName, ")", sep = "")
+    }
+    useText
+}
 ```
 
 
@@ -84,9 +94,10 @@ Marc L. Salit
 
 # Methods
 ## Pipeline for Evaluating Prokaryotic References: PEPR
-Pipeline for Evaluating Prokaryotic Reference (PEPR) consists of three bioinformatic pipelines written in python (Figure Pipeline).  The three bioinformatic pipelines are Genome Evaluation, Genome Characterization, and Genomic Purity.  Bioinformatic pipeline inputs defined with a yaml file.  The individual pipeline coordinates the execution of a number of commandline tools, ogging the standard output and standard error for each step in the pipeline  in time stamped files for later inspection and debugging. Pipeline code avaiable at ([github.com/nate-d-olson/pepr](https://github.com/nate-d-olson/pepr) ). To reduce the barrier for reuse two Docker ([www.docker.com](https://www.docker.com/) ) containers are available with pipeline dependencies pre-installed excluding the Genome Analysis Toolkit (due to licensing restrictions). Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system. The pepr container (https://registry.hub.docker.com/u/natedolson/pepr/) includes dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository. The docker-pathoscope ([https://registry.hub.docker.com/u/natedolson/docker-pathoscope/](https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) ) has dependencies for the genomic purity pipeline installed.
+Pipeline for Evaluating Prokaryotic Reference (PEPR) consists of three bioinformatic pipelines written in python `r I(pasteLabel("Figure", figCount, "f.pepr_workflow"))`.  The three bioinformatic pipelines are Genome Evaluation, Genome Characterization, and Genomic Purity.  Bioinformatic pipeline inputs defined with a yaml file.  The individual pipeline coordinates the execution of a number of commandline tools, ogging the standard output and standard error for each step in the pipeline  in time stamped files for later inspection and debugging. Pipeline code avaiable at ([github.com/nate-d-olson/pepr](https://github.com/nate-d-olson/pepr) ). To reduce the barrier for reuse two Docker ([www.docker.com](https://www.docker.com/) ) containers are available with pipeline dependencies pre-installed excluding the Genome Analysis Toolkit (due to licensing restrictions). Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments that can be run on any desktop, cloud, and high performance computing environment, regardless of the operating system. The pepr container (https://registry.hub.docker.com/u/natedolson/pepr/) includes dependencies for the genome evaluation and characterization pipelines, a Dockerfile for building the container is included in the pepr repository. The docker-pathoscope ([https://registry.hub.docker.com/u/natedolson/docker-pathoscope/](https://registry.hub.docker.com/u/natedolson/docker-pathoscope/) ) has dependencies for the genomic purity pipeline installed.
 
 ```{r echo = FALSE, message=FALSE, warning=FALSE, fig.cap= "__PEPR workflow.__ White objects are pipeline inputs, grey objects are the three pipeline components, light blue objects are the pipeline products."}
+figCounts <- incCount(figCount, "f.pepr_workflow")
 grid.raster(readPNG("pepr-workflow.png"))
 ```
 
@@ -109,15 +120,86 @@ RM8376 is extracted genomic DNA from _Staphylococcus areus_ strain NRS100 isolat
 A single colony was obtained from the initial culture stab after an overnight incubation at 37°C on an plate. A single colony was used to innoculate a new plate. One colony from the new plate was grown in 20 mL LB at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. Glycerol freezes were made from the remaining stock. DNA and agarose plugs were made from the 15 x 150 mm plates. DNA was isolated by lysing the bacteria in lysis Solution containing NaCl, Tris, EDTA and lysostaphin (25 µ g/ml) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol. Drained, then dissolved in TE (Tris 10 mM, EDTA 0.1 mM, pH8.0).
 
 ### Experimental Design
-The _S. aureus_ candidate reference materials were sequenced using three orthogonal sequences methods. Long read sequencing using PacBio RSII[^pacbio], DNA Template Prep Kit 3.0 was used to prepare the library and sequenced with the P6-C4 chemistry.  Eight replicate vials were randomly sampled from the lot of 1500 vials and sequenced using two short read sequencing technologies, Ion Torrent PGM [^iontorrent], and Illumina MiSeq [^illumina]. Technical replicate sequencing libraries were prepared for each of the eight vials using the Nextera DNA Sample Prep Kit[^illumina], samples were barcoded using the Nextera Index Kit and sequenced using the MiSeq 600 cycle Reagent kit v3 for 2 X 300 bp reads.  The 16 libraries were pooled and sequencing in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using the Ion Xpress Plus kit [^iontorrent], including the Ion Xpress plus fragment plus library kit, with a 318C chip. The vials were barcoded using the IonXpress Kit[^iontorrent] and sequencing template was prepared using the Ion PGM Template OT2 400 kit and the IonPGM400 kit was used for sequencing. The raw sequence data is archived at the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see __TABLE SEQ INFO__ for accession numbers. 
-
-Independent libraries were constructed from 8 replicate Staphylococcus aureus microbial genomic DNA reference material (RM8376) vials the libraries were pooled and sequenced in a single run. Libraries were prepared using the Applied Biosystems automated Library Builder system using the Ion Xpress Plus kit (lot #1650102), including the Ion Xpress plus fragment plus library kit, with a 318C chip. The 8 vials were barcoded using the IonXpress Kit (vials numbers correlate with MiSeq data vial numbers). The template was prepared using the Ion PGM Template OT2 400 kit and the IonPGM400 kit was used for sequencing. Base calls were made using the Torrent Suite version 4.4.2
+The _S. aureus_ candidate reference materials were sequenced using three orthogonal sequences methods. Long read sequencing using PacBio RSII[^pacbio], DNA Template Prep Kit 3.0 was used to prepare the library and sequenced with the P6-C4 chemistry.  Eight replicate vials were randomly sampled from the lot of 1500 vials and sequenced using two short read sequencing technologies, Ion Torrent PGM [^iontorrent], and Illumina MiSeq [^illumina]. Technical replicate sequencing libraries were prepared for each of the eight vials using the Nextera DNA Sample Prep Kit[^illumina], samples were barcoded using the Nextera Index Kit and sequenced using the MiSeq 600 cycle Reagent kit v3 for 2 X 300 bp reads.  The 16 libraries were pooled and sequencing in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using the Ion Xpress Plus kit [^iontorrent], including the Ion Xpress plus fragment plus library kit, with a 318C chip. The vials were barcoded using the IonXpress Kit[^iontorrent] and sequencing template was prepared using the Ion PGM Template OT2 400 kit and the IonPGM400 kit was used for sequencing. The raw sequence data is archived at the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see `r I(pasteLabel("Table", tableCount, "t.seq_summary"))` for accession numbers. 
 
 ## Reference assembly
 PacBio long read data was used to generate the reference genome assembly used as input with the Genome Evaluation Pipeline. PacBio Reads wereassembled using HGAP assembler - version __TODO__ [@Koren2013].  The _de novo_ assembly was validated using OpGen optical mapping data generate [^opgen].  Agarose plugs generated from the same culture stock as that used to generate the DNA reference material was used for optical mapping measurement.  Restriction enzyme NcoI was used for the restriction digest.
 
 # Results
-__In seperate document__
+```{r echo=FALSE, message=FALSE} 
+peprDB <- dplyr::src_sqlite(db_path)
+```
+## Summary of Sequencing Datasets
+The number of reads, read, length, insert size for paired-end datasets as well as coverage for _S. aureus_ datasets, presented in Table 1, was generated from the database using the `seq_summary_table(peprDB)` command in the peprr package `r I(pasteLabel("Table", tableCount, "t.seq_summary"))`.  The MiSeq sequencing run resulted in over 1.5 million pair end (3 million total) reads per library with a median read length just under 250 bp.  Whereas the PGM sequencing run produced about 0.5 million reads per library with a median read length around 235 bp.  The higher throughput and paried end reads resulted in a higher per library coverage for MiSeq compared to PGM (~140X vs. ~30X).  Despite using the 400bp sequencing chemistry the PGM median read length was less than 250 bp.  The three PacBio datasets are technical sequencing replicates (SMRT cells) from the same sequencing library, with a median read lengths of XYZ, and throughput of XYZ, resulting in a total of ??X coverage.
+
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+tableCount <- incCount(tableCount, "t.seq_summary")
+kable(seq_summary_table(peprDB), 
+      round = 0, row.names = FALSE, caption = "Summary of sequencing datasets")
+```
+
+## Genome Assembly
+The _de-novo_ assembly using PacBio data was performed using the HGAP assembler, as part of the SMRTanalysis software (__version info__), resulting in a closed genome and plasmid assembly. Optical mapping data generated by the OpGen Argus system was used to validate the genome assembly.  Optical mapping data agreed with the _de novo_ assembly `r I(pasteLabel("Figure", figCount, "f.assembly_comp"))`. The plasmid is too small for OpGen optical mapping technology and therefore the plasmid assmebly was not validated with the optical mapping data.  
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.scap= "Comparison of optical map data to genome assembly.", fig.cap = "Alignment of in-silico genome map generated from the PacBio HGAP assembly to the OpGen optical map.  Blue bars in map represent NocI restriction sites, black lines indicate co-linear regions."}
+figCounts <- incCount(figCount, "f.assembly_comp")
+grid.raster(readPNG("opgen_assembly_comparison.png"))
+```
+
+The short read sequencing data supported the _de novo_ genome assembly. Pilon, a program developed for genome finishing and variant calling, identifies positions in the a genome assembly that exbiting characteristics of missassemblies and base call errors.  Running Pilon using the MiSeq data did not identify any missassemblies or base call errors.  Pilon did identifed __TODO ## TODO__ one and two base indels, and __TODO ## TODO__ larger deletions in the reference assembly.  Evaluation of the mapped MiSeq and PGM reads to these regions identicates that __TODO figures and summary statement TODO___.
+
+## Base Level Analysis
+### Base Purity
+A base purity metric was used for base level analysis.  The purity value is the number bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  Comparison of the purity values between for all positions in the genome for two orthogonal sequencing methods was used to differentiate between positions with low purity values due to platform specific biases and those due to true biological diversity `r I(pasteLabel("Figure", figCount, "f.purity_scatter"))`.  Out of $`r rm_genome_size/1000000`\times 10^6$ positions in the genome `r pos_pur_gt99_both` positions had purity values greater than 99\% for both short read sequencing platforms `r I(pasteLabel("Table", tableCount, "t.purity_counts"))`.  `r pos_pur_gt99_one` and `r pos_pur_gt95_one` positions with purity values greater than 99% and 95% for one of the two platforms.  All postions had a purity value greater than `r min_max_pur_position` for at least one of the two platforms. Positions with the low purity values for one platform and not another indicate a potential platform specific bias.  The positions with low purity for MiSeq were non-uniformly distributed where as positions with low purity for PGM were unifromly distributed `r I(pasteLabel("Figure", figCount, "f.purity_genome_coord"))`.  The reference base is identified using a third orthogonal sequencing method (PacBio RSII) and thus a low value for one of the two short reads sequencing platforms represents agreement between two of the three sequencing methods.  
+
+```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE}
+source("base_purity_analysis.R")
+```
+
+```{r echo = FALSE, message = FALSE, warnings = FALSE}
+tableCount <- incCount(tableCount, "t.purity_counts")
+pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable(row.names = NA, caption = "Number of genome positions with purity values higher and lower than 0.99 for MiSeq and PGM sequencing platforms.")
+```
+
+```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "_Comparison of base purity values for PGM and MiSeq._ Positions are colored based of high and low purity values for the two sequencing platforms."}
+figCounts <- incCount(figCount, "f.purity_scatter")
+ggplot2::ggplot(pur_dat_id_filt) +
+    ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
+                        alpha = 0.5) +
+    ggplot2::labs(x = "MiSeq", y = "PGM") + ggplot2::theme_bw() + 
+    ggplot2::xlim(min_val, 1) + ggplot2::ylim(min_val, 1)
+```
+
+```{r cache = TRUE, echo = FALSE, message = FALSE, warnings = FALSE, fig.show = 'asis', fig.cap= "_Position of bases with low purity for one or both of the two short read sequencing platforms._"}
+figCounts <- incCount(figCount, "f.purity_genome_coord")
+ggplot(pur_dat_id_filt %>% filter(CHROM == chrom_names[1])) + 
+    geom_bar(aes(x = POS, fill = pur_group)) + 
+    facet_wrap(~pur_group, ncol = 1, scales = "free_y") + theme_bw()
+```
+
+
+### Sequence homogeneity
+The genomic material homogeneity was assessed through a pairwise statistical analysis of the replicate MiSeq datasets using the varsan somatic variant caller.  The pairwise variant analysis failed to identify any statistically significant base level differences among the replicates `r I(pasteLabel("Table", tableCount, "t.homogeneity_sig"))`.
+
+```{r echo =FALSE}
+tableCount <- incCount(tableCount, "t.homogeneity_sig")
+kable(homogeneity_sig_table(peprDB, rename_cols = TRUE), 
+      row.names = FALSE,
+      caption = "Pairwise variant analysis results")
+```
+
+## Genomic Purity
+Based on taxonomic assignment of the PGM and MiSeq data the reference material has minimal if any genomic contaminants `r I(pasteLabel("Figure", figCount, "f.contam_counts"))`, with a maximum `r max_contam` of reads in any dataset classified as beloning not beloning to the genus `r rm_genus`.  The most abundant contaminant was _Escherichia coli_ which is a well documented contaminant of molecular biology reagents `r I(pasteLabel("Figure", figCount, "f.contam_taxa"))`. Lower abundance contaminants are most likely bioinformatic errors and not true contaminants. To provide a conservative estimate of the genomic purity the stated value assumes all reads identified as not beloning to the genus _Staphylococcus_ are contamiants.
+
+```{r echo = FALSE, fig.show = 'asis', fig.cap= "Proportion of reads from contaminant DNA.", warning=FALSE, message=FALSE}
+figCounts <- incCount(figCount, "f.contam_counts")
+contam_counts_figure(peprDB, rm_genus)
+```
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, fig.height = 6, fig.cap= "Breakdown of contaminants by organism.",fig.retina=TRUE}
+figCounts <- incCount(figCount, "f.contam_taxa")
+contam_point_line_figure(peprDB, rm_genus)
+```
 
 # Discussion
 ## General Pipeline information
