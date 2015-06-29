@@ -1,3 +1,4 @@
+pgm_med_read_length <- 0
 pos_pur_gt99_both <- 0
 pos_pur_gt99_one <- 0
 pos_pur_gt95_one <- 0
