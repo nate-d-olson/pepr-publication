@@ -1,12 +1,13 @@
 ---
 title: 'PEPR: Pipeline for Evaluating Prokaryotic References'
 output:
-  pdf_document:
-    fig_caption: yes
-    number_sections: yes
   html_document:
     fig_caption: yes
     keep_md: yes
+    number_sections: yes
+    theme: cosmo
+  pdf_document:
+    fig_caption: yes
     number_sections: yes
   word_document:
     fig_caption: yes
