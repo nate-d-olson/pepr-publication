@@ -1,19 +1,25 @@
 ---
 title: 'PEPR: Pipeline for Evaluating Prokaryotic References'
 output:
+  word_document:
+    fig_caption: yes
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
   html_document:
     fig_caption: yes
     keep_md: yes
     number_sections: yes
     theme: cosmo
-  pdf_document:
-    fig_caption: yes
-    number_sections: yes
-  word_document:
-    fig_caption: yes
 bibliography: pepr-pub.bib
 ---
-
+<!--
+TODO
+1. update figure references using kfigr
+2. revise pilon results text
+3. add multiple comparison testing for homogeneity
+4. add base purity outlier statistic
+-->
 ```{r, echo = FALSE, message=FALSE}
 library(png)
 library(grid)
@@ -169,7 +175,7 @@ kable(homogeneity_sig_table(peprDB, rename_cols = TRUE),
 ## Genomic Purity Pipeline
 Short read sequencing data was used to identify the proportion of DNA in the material from an organism other than the material strain.  The PGM and MiSeq data the reference material has minimal if any genomic contaminants (`r I(pasteLabel("Figure", figCount, "f.contam_counts"))`), with a maximum of `r max_contam` reads in any dataset classified as not belonging to the genus _`r rm_genus`_.  The most abundant contaminant was _Escherichia coli_ (`r I(pasteLabel("Figure", figCount, "f.contam_taxa"))`). Lower abundant contaminants are most likely bioinformatic errors and not true contaminants. 
 
-```{r echo = FALSE, fig.show = 'asis', fig.cap= "__Proportion of reads from contaminant DNA.__", , fig.ext='png', warning=FALSE, message=FALSE}
+```{r echo = FALSE, fig.show = 'asis', fig.cap= "__Proportion of reads from contaminant DNA.__", fig.ext='png', warning=FALSE, message=FALSE}
 contam_counts_figure(peprDB, rm_genus)
 ```
 
