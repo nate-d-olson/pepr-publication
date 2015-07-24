@@ -32,6 +32,7 @@ pur_dat_id_filt <- pur_dat_id %>%
 min_val <- min(c(pur_dat_id_filt$plat1, pur_dat_id_filt$plat2)) 
 
 ## values for text
+total_pos <- nrow(pur_dat)
 pos_pur_gt99_both <- pur_dat_id %>% filter(pur_group == "MiSeq-High PGM-High") %>% nrow()
 pos_pur_lt99_both <- pur_dat_id %>% filter(pur_group == "MiSeq-Low PGM-Low") %>% nrow()
 pur_dat_max <- pur_dat_id %>% rowwise() %>% mutate(max_pur = max(plat1, plat2))
