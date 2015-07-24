@@ -1,9 +1,8 @@
 ---
 title: 'PEPR: Pipeline for Evaluating Prokaryotic References'
 output:
-  word_document:
-    fig_caption: yes
   pdf_document:
+    fig_caption: yes
     keep_tex: yes
     latex_engine: xelatex
     number_sections: yes
@@ -11,6 +10,8 @@ output:
     fig_caption: yes
     keep_md: yes
     number_sections: yes
+  word_document:
+    fig_caption: yes
 bibliography: pepr-pub.bib
 ---
 
@@ -24,22 +25,27 @@ library(kfigr)
 library(peprr)
 source("rm_metadata.R")
 source("calc_results_values.R")
-opts_chunk$set(message=FALSE, warning=FALSE, echo = FALSE, fig.ext = "png")
+opts_chunk$set(message=FALSE, warning=FALSE, echo = FALSE)
 ```
 
 # Authors
 Nathan D. Olson   
-Justin M. Zook   
+Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA
+
+
+Justin M. Zook 
+Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA
+
 Scott A. Jackson   
+Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA
+
 Marc L. Salit  
+Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA
+Department of Bioengineering, Stanford University, Stanford, CA, USA
  
 # Abstract
 
 # Introduction
-* General background - painting the picture
-    * Advances in genome sequencing 
-    * Genome sequencing applications
-
 Genome sequencing is a measurement process that includes sample preparation using molecular biology methods, monitoring of the sequencing reaction, and computational analysis of the sequencing results. Sources of systematic and random error are present at each step in the measurement process. Our understanding of the measurement process in still maturing and the extent to which the measurement process sources of error are known and characterized varies significantly [@Olson2015]. Use of homogeneous and stable reference materials can be used to benchmark existing methods and aid in the identification and characterization of the measurement process. We recently characterized a whole human genome (NIST Reference Material 8398) to assess performance of human variant calling [@Zook2014], but no reference materials for microbial sequencing currently exist.  
     
 Microbial reference materials well-characterized for whole genome sequence controls are needed to validate the microbial genome measurement process. Four microbial genomic DNA candidate reference materials are being developed at the National Institute of Standards and Technology (NIST) to meet this need. These candidate reference materials represent a range of GC content to challenge sequencing methods [@Quail2012]. The materials are being characterized for the purity and homogeneity of the genome sequence, stability of the DNA fragments, and presence of genomic material other than the material strain. The general approach to material characterization uses orthogonal sequencing methods along with technical replicates to obtain consensus values for the characterized properties.  These consensus values are our best current estimates of the true values, but we are not yet able to assign confidence to these values since all systematic errors of current sequencing technologies are not sufficiently understood.  A laboratory can sequence these reference materials to assess performance of sequencing, assembly, and variant calling.
@@ -53,7 +59,7 @@ Pipeline for Evaluating Prokaryotic References (PEPR) consists of three bioinfor
 
 
 
-```{r workflowFig, fig.ext = "png", fig.align = 'left', anchor = "Figure", fig.cap= "PEPR workflow. White objects are pipeline inputs, grey objects are the three pipeline components, light blue objects are the pipeline products."}
+```{r workflowFig, fig.align = 'center', anchor = "Figure", fig.cap= "PEPR workflow. White objects are pipeline inputs, grey objects are the three pipeline components, light blue objects are the pipeline products."}
 grid.raster(readPNG("pepr-workflow.png"))
 ```
 
@@ -72,7 +78,7 @@ The purity of the genomic material, presence of DNA from sources other than the 
 
 ## _S. aureus_ Sequencing
 ### Material
-Sequencing data for the NIST RM8376, genomic DNA from _Staphylococcus areus_ strain NRS100 isolate COL (Biosample SAMN02854573), was used to demonstrate how PEPR is used to characterize a microbial genomic material.  The strain was isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075). The genomic material represents a large homogeneous batch of extracted DNA, 1500 vials each with $3\mu\ g$.  The extracted DNA was prepared from single colony of the initial culture stab after an overnight incubation at 37°C on an agar plate and a single colony was used to inoculate a new plate. One colony from the new plate was grown in 20 mL Luria-Bertani (LB) broth at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. DNA was isolated by lysing the bacteria in lysis Solution containing NaCl, Tris, EDTA and lysostaphin (25$\mu g/ml$) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol. Drained, then dissolved in TE (Tris 10 mM, EDTA 0.1 mM, pH8.0).
+Sequencing data for the NIST RM8376, genomic DNA from _Staphylococcus areus_ strain NRS100 isolate COL (Biosample SAMN02854573), was used to demonstrate how PEPR is used to characterize a microbial genomic material.  The strain was isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075). The genomic material represents a large homogeneous batch of extracted DNA, 1500 vials each with $3\mu\ g$.  The extracted DNA was prepared from single colony of the initial culture stab after an overnight incubation at 37°C on an agar plate and a single colony was used to inoculate a new plate. One colony from the new plate was grown in 20 mL Luria-Bertani (LB) broth at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. DNA was isolated by lysing the bacteria in lysis Solution containing NaCl, Tris, EDTA and lysostaphin (25$\mu g/ml$) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70% alcohol. Drained, then dissolved in TE (Tris 10 mM, EDTA 0.1 mM, pH8.0).
 
 ### Experimental Design
 The _S. aureus_ candidate reference materials were sequenced using three orthogonal sequencing platforms; Pacific Biosciences RSII (PacBio)[^pacbio], Ion Torrent PGM [^iontorrent], and Illumina MiSeq [^illumina]. For PacBio sequencing, the sequencing library was prepared using DNA Template Prep Kit 3.0 with pooled DNA from three randomly sampled vials of RM8376. The resulting library was sequenced with the P6-C4 chemistry.  For the Ion Torrent PGM [^iontorrent], and Illumina MiSeq [^illumina] seqeuncing eight vials were randomly sampled from the lot of 1500 vials. For MiSeq, two technical replicate libraries were prepared for each of the eight vials using the Nextera DNA Sample Prep Kit[^illumina], samples were barcoded using the Nextera Index Kit and sequenced using the MiSeq 600 cycle Reagent kit v3 for 2 X 300 bp reads.  The 16 libraries were pooled and sequencing in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using the Ion Xpress Plus kit [^iontorrent], with the Ion Xpress plus fragment plus library kit.  The vials were barcoded using the IonXpress Kit[^iontorrent] and sequencing template was prepared using the Ion PGM Template OT2 400 kit and the IonPGM400 kit was used for sequencing on a 318C chip. The raw sequence data is archived in the Genbank Sequence Read Archive ([ncbi.nlm.nih.gov/sra](http://www.ncbi.nlm.nih.gov/sra)), see `r figr(label = "seqTable", prefix = TRUE, link = TRUE, type = "Table")` for accession numbers. 
@@ -85,7 +91,7 @@ PacBio long read data were used to generate a _de novo_ genome assembly for use 
 The _de-novo_ assembly using PacBio data was performed using the HGAP assembler, and it resulted in a closed genome and plasmid assembly. Optical mapping data was used to validate the genome assembly and agreed with the _de novo_ assembly (`r figr(label = "opgenCompFig", prefix = TRUE, link = TRUE, type = "Figure")`). The plasmid is too small for OpGen optical mapping technology and therefore the plasmid assembly was not validated with the optical mapping data. 
 
 
-```{r opgenCompFig, fig.align = "left", fig.cap= "Comparison of optical map data to genome assembly. Alignment of in-silico genome map generated from the PacBio HGAP assembly to the OpGen optical map.  Blue bars in map represent NocI restriction sites, black lines indicate co-linear regions.", anchor = "Figure"}
+```{r opgenCompFig, fig.height= 1.86, fig.width=6.52, fig.align = "cene", fig.cap= "Comparison of optical map data to genome assembly. Alignment of in-silico genome map generated from the PacBio HGAP assembly to the OpGen optical map.  Blue bars in map represent NocI restriction sites, black lines indicate co-linear regions.", anchor = "Figure"}
 grid.raster(readPNG("opgen_assembly_comparison.png"))
 ```
 
@@ -107,7 +113,8 @@ kable(seq_summary_table(peprDB),
 ```{r source_base_analysis, cache = TRUE}
 source("base_purity_analysis.R")
 ```
-A base purity metric was used to evaluate the degree to which the sequencing data supports the reference base call.  The base purity metric is the number of bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  We comparison of the purity values between two orthogonal sequencing methods for all positions in the genome.  This comparison was used to differentiate between positions with low purity values due to platform specific biases and those potentially due to true biological diversity (`r figr(label = "purityScatterFig", prefix = TRUE, link = TRUE, type = "Figure")`).  Out of `r rm_genome_size` positions in the genome `r pos_pur_gt99_both` positions had purity values greater than 99\% for both short read sequencing platforms (`r figr(label = "purityTable", prefix = TRUE, link = TRUE, type = "Table")`).  `r pos_pur_gt99_one` and `r pos_pur_gt97_one` positions with purity values greater than 99% and 97%, respectively, for one of the two platforms.  Only `r pos_pur_lt99_both` positions had a purity < 99% for both platforms, and no positions had a purity value less than `r min_max_pur_position` for both platforms. The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (`r figr(label = "purityPositionFig", prefix = TRUE, link = TRUE, type = "Figure")`).  
+
+A base purity metric was used to evaluate the degree to which the sequencing data supports the reference base call.  The base purity metric is the number of bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads aligned to the position.  We comparison of the purity values between two orthogonal sequencing methods for all positions in the genome.  This comparison was used to differentiate between positions with low purity values due to platform specific biases and those potentially due to true biological diversity (`r figr(label = "purityScatterFig", prefix = TRUE, link = TRUE, type = "Figure")`).  Out of `r total_pos` positions in the genome `r pos_pur_gt99_both` positions had purity values greater than 99% for both short read sequencing platforms (`r figr(label = "purityTable", prefix = TRUE, link = TRUE, type = "Table")`).  `r pos_pur_gt99_one` and `r pos_pur_gt97_one` positions with purity values greater than 99% and 97%, respectively, for one of the two platforms.  Only `r pos_pur_lt99_both` positions had a purity < 99% for both platforms, and no positions had a purity value less than `r min_max_pur_position` for both platforms. The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (`r figr(label = "purityPositionFig", prefix = TRUE, link = TRUE, type = "Figure")`).  
 
 ```{r purityTable, anchor = "Table"}
 pur_dat_id %>% group_by(pur_group) %>% summarise(count = n()) %>% kable(row.names = NA, caption = "Number of genome positions with purity values higher and lower than 0.99 for MiSeq and PGM sequencing platforms.")
@@ -138,9 +145,9 @@ kable(homogeneity_sig_table(peprDB, rename_cols = TRUE),
 ```
 
 ## Genomic Purity Pipeline
-Short read sequencing data was used to identify the proportion of DNA in the material from an organism other than the material strain.  Reads categorized as genomic contaminants as classified by PathoScope as not beloning to the genus _`r rm_genus`._ Based on analysis of the MiSeq and PGM sequencing data the reference material has minimal if any genomic contaminants(`r figr(label = "contamCountsFig", prefix = TRUE, link = TRUE, type = "Figure")`), with a    maximum of `r max_contam` reads in any dataset classified as not belonging to the genus _`r rm_genus`_.  The most abundant contaminant was _Escherichia coli_ (`r figr(label = "contamTaxaFig", prefix = TRUE, link = TRUE, type = "Figure")`).  
+Short read sequencing data was used to identify the proportion of DNA in the material from an organism other than the material strain.  Reads categorized as genomic contaminants as classified by PathoScope as not beloning to the genus `r rm_genus`. Based on analysis of the MiSeq and PGM sequencing data the reference material has minimal if any genomic contaminants(`r figr(label = "contamCountsFig", prefix = TRUE, link = TRUE, type = "Figure")`), with a    maximum of `r max_contam` reads in any dataset classified as not belonging to the genus `r rm_genus`.  The most abundant contaminant was _Escherichia coli_ (`r figr(label = "contamTaxaFig", prefix = TRUE, link = TRUE, type = "Figure")`).  
 
-```{r contamCountsFig, fig.align = "center", anchor = "Figure", fig.cap= "Proportion of reads from contaminant DNA.Reads categorized as genomic contaminants as classified by PathoScope as not beloning to the genus _`r rm_genus`_."}
+```{r contamCountsFig, fig.align = "center", anchor = "Figure", fig.cap= "Proportion of reads from contaminant DNA.Reads categorized as genomic contaminants as classified by PathoScope as not beloning to the genus Staphylococcus."}
 contam_counts_figure(peprDB, rm_genus)
 ```
 
@@ -166,7 +173,7 @@ The reference genome validated and if nessessary refined by the PEPR `evaluation
 The PEPR database includes a number of summary statistics for the sequencing datasets processed.  Sequencing dataset throughput and read lengths were as expected based on the library prep and sequencing methods used excluding the PGM datasets.  The 400 bp sequencing and library preparation methods yielded median read lengths of `r pgm_med_read_length`bp. The shorter read length is potentially due to the low GC content, which is known to challenge current sequencing technologies [@Quail2012].  
 
 ### Base Level Purity
-To assess the purity of a genome position or base in the material as a whole, replicate sequencing datasets are pooled by sequencing platform.  SAMtools mpileup was used to calculate the number of base calls that support or disagree with the reference base.  The base call counts are used to calculate the base level purity.  Through comparison of the base purity for two orthogonal sequencing methods we identified genome positions low purity values due to platform specific systematic sequencing errors. The reference base is identified using a third orthogonal sequencing method (PacBio RSII), which only chooses the dominant base and does not identify small impurities. Thus, a low purity (below 50%) for one of the two short reads sequencing platforms and a high purity values for hte other means that two technologies (one short read and one long read) agree that the dominant base is the reference base. It is also important to acknowledge that even if two platforms agree about an impurity, they are potentially susceptible to the same unknownbias and thus the outlier platform could represent the true value.  The sequencing technologies used to characterize the material are still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
+To assess the purity of a genome position or base in the material as a whole, replicate sequencing datasets are pooled by sequencing platform.  SAMtools mpileup was used to calculate the number of base calls that support or disagree with the reference base.  The base call counts are used to calculate the base level purity.  Through comparison of the base purity for two orthogonal sequencing methods we identified genome positions low purity values due to platform specific systematic sequencing errors. The reference base is identified using a third orthogonal sequencing method (PacBio RSII), which only chooses the dominant base and does not identify small impurities. Thus, a low purity (below 50\%) for one of the two short reads sequencing platforms and a high purity values for hte other means that two technologies (one short read and one long read) agree that the dominant base is the reference base. It is also important to acknowledge that even if two platforms agree about an impurity, they are potentially susceptible to the same unknownbias and thus the outlier platform could represent the true value.  The sequencing technologies used to characterize the material are still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls.
 
 A number of base levels metrics, such as strand bias, are calculated as part of the PEPR pipeline and are included in the pipeline results database. These metrics can be used to differentiate positions with low purity due to measurement error and those due to biological variability. Use of additional metrics and algorithms developed for the identification of low frequency variants, such as loFreq [@Wilm2012], could help identify positions with low levels of biological variability, but are not currently implemented in PEPR.
 
