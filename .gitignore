@@ -5,9 +5,17 @@ packrat/src
 *.md
 *html
 packrat/src/
-
 ## ignoring cache - too large for github
 *cache
 ## Ignoring compiled documents
 *docx
 *pdf
+example.eps
+pepr-pub.tex
+pepr_pub-blx.bib
+pepr_pub-concordance.tex
+pepr_pub.bbl
+pepr_pub.log
+pepr_pub.run.xml
+pepr_pub.synctex.gz
+pepr_pub.tex
