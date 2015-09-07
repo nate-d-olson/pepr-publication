@@ -1,0 +1,46 @@
+Move to discussion
+
+Supplemental Methods
+
+\label{method:5}
+\paragraph{Material}
+%%% Nancy's comment
+%%% This part was a bit confusing.  I made some suggested changes, but I don’t know 100% that I understood the process clearly. 
+%%% Not quite true, right?  From many plates that came initially from a single colony?
+%%% How much volume (extraction buffer) was added per plate?
+%%% Is 15 the number of plates, or the height of the plates?  I’m thinking number??
+%%% Spell out EDTA and SDS
+%%% I think WERB doesn’t let us use Molar, right??  mMol/L instead, here and elsewhere
+%%% Paragraph needs a Sentence here about the bottling?  Or final concentration?  Or other info for preparing the vials?
+
+Sequencing data for the NIST candidate reference material RM8376, genomic DNA from \emph{Staphylococcus aureus} strain NRS100 isolate COL (Biosample SAMN02854573) was selected as a model system to demonstrate how PEPR is used to characterize a microbial genomic material.  The strain was isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075). The genomic material represents a large homogeneous batch of extracted DNA, with 1500 vials each with $3\mu g$.  The extracted DNA was prepared from single colony of the initial culture stab was incubated overnight at 37°C on an agar plate and a single colony was used to inoculate a new plate. One colony from the new plate was grown in 20 mL Luria-Bertani (LB) broth at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. DNA was isolated by lysing the bacteria in lysis solution containing NaCl, Tris, EDTA and lysostaphin ($25\mu g/ml$) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol, drained, and dissolved in TE buffer (Tris 10 mM, EDTA 0.1 mM, pH8.0).
+
+\paragraph{Experimental Design}
+
+%%% Nancy's comment
+%%% Some of the footnotes are the same company – could you either refer back to the first number for that footnote, or else just put the company name and leave the other details out?
+The \emph{S. aureus} candidate reference materials were sequenced using three orthogonal sequencing platforms: Pacific Biosciences RSII (PacBio)[ADDFOOTNOTE pacbio], Ion Torrent PGM [ADDFOOTNOTE iontorrent], and Illumina MiSeq [ADDFOOTNOTE illumina]. For PacBio sequencing, the sequencing library was prepared using DNA Template Prep Kit 3.0 with pooled DNA from three randomly sampled vials of the candidate reference material RM8376. The resulting library was sequenced with the P6-C4 chemistry.  For the Ion Torrent PGM [ADDFOOTNOTE iontorrent] and Illumina MiSeq [ADDFOOTNOTE illumina] sequencing, eight vials were randomly sampled from the lot of 1500 vials. For MiSeq, two technical replicate libraries were prepared for each of the eight vials using the Nextera DNA Sample Prep Kit[ADDFOOTNOTE illumina]; samples were barcoded using the Nextera Index Kit and sequenced using the MiSeq 600 cycle Reagent kit v3 for 2 X 300 bp reads.  The 16 libraries were pooled and sequenced in a single run.  Single barcoded 400 bp Ion Torrent PGM libraries were prepared for each of the eight vials using the Ion Xpress Plus kit [ADDFOOTNOTE iontorrent].  The vials were barcoded using the IonXpress Kit[ADDFOOTNOTE iontorrent], sequencing template was prepared using the Ion PGM Template OT2 400 kit and the IonPGM400 kit was used for sequencing on a 318C chip. The raw sequence data is archived in the Genbank Sequence Read Archive (http://www.ncbi.nlm.nih.gov/sra), see Table \ref{Table:seqTable} for accession numbers.  A genome map was obtained for the candidate reference material from optical mapping data generated using the Argus Optical Mapping System[ADDFOOTNOTE opgen]. Agarose plugs generated from the same culture stock as that used to generate the DNA reference material were used for optical mapping measurement.  Restriction enzyme NcoI was used for the restriction digest. These steps occured prior to our PEPR pipeline.
+
+
+
+\subsection{\emph{S. aureus} Reference Assembly}
+\label{method:6}
+%%% Nancy's comment
+%%% There is very little detail about the optical mapping measurement here.  Since Fig. 2 has some optical mapping data, I think you need a methods section describing it… 
+
+PacBio long read data were used to generate a \emph{de novo} genome assembly for use in the Genome Evaluation Pipeline. PacBio Reads were assembled using SMRTAnalysis software version 2.3 [ADDFOOTNOTE pacbio] to apply the HGAP assembly algorithm \cite{Koren2013}.  To identify potential errors in the assembly, an \emph{in silico} digest of assembly was compared the genome map obtained from the optical mapping data using OpGen MapSolver software [ADDFOOTNOTE opgen].
+
+
+\subsection{Genome Assembly}
+Prior to running PEPR ....
+The \emph{de-novo} assembly using PacBio data was performed using the HGAP assembler, and it resulted in a closed genome and plasmid assembly. Optical mapping data was used to validate the genome assembly and agreed with the \emph{de novo} assembly (Fig. \ref{fig:opgenCompFig}). The plasmid is too small for OpGen optical mapping technology, and therefore the plasmid assembly was not validated with the optical mapping data. 
+
+
+<< opgenCompFig, fig.height= 1.86, fig.width=6.52, fig.align = "center", fig.cap= "Comparison of optical map data to genome assembly. Alignment of in-silico genome map generated from the PacBio HGAP assembly to the OpGen optical map.  Blue bars in map represent NocI restriction sites, black lines indicate co-linear regions.", fig.lp = "fig:">>=
+grid.raster(readPNG("opgen_assembly_comparison.png"))
+@
+
+
+
+\subsection{Genome Characterization Pipeline}
+The Genome Characterization Pipeline calculates summary statistics for the input datasets and performs base level purity and homogeneity analysis. The corrected reference assembly from the Genome Evaluation Pipeline is used as input for the Genome Characterization Pipeline along with both long and short read sequencing data. 
