@@ -77,21 +77,36 @@ Sys.setenv(TEXINPUTS=getwd(),
 
 %\titlerunning{Short form of title}        % if too long for running head
 
-\author{First Author         \and
-        Second Author %etc.
+\author{Nathan D. Olson \and
+        Justin M. Zook \and
+        Daniel V. Samarov \and
+        Scott A. Jackson \and
+        Marc L. Salit
 }
 
 %\authorrunning{Short form of author list} % if too long for running head
 
-\institute{F. Author \at
-              first address \\
-              Tel.: +123-45-678910\\
-              Fax: +123-45-678910\\
-              \email{fauthor@example.com}           %  \\
-%             \emph{Present address:} of F. Author  %  if needed
+\institute{N. Olson \at
+              Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA \\
+              Tel.: +123-45-678910 +1-301-975-4873\\
+              \email{nolson@nist.gov} 
            \and
-           S. Author \at
-              second address
+           J. Zook \at
+              Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA \\
+              \email{justin.zook@nist.gov}
+           \and
+           D. Samarov \at
+              Statistical Engineering Division, Information Technology Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA \\
+              \email{daniel.samarov@nist.gov}
+          \and
+           S. Jackson \at
+              Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA \\
+              \email{scott.jackson@nist.gov}
+          \and
+           M. Salit \at
+              Biosystems and Biomaterials Division, Material Measurement Laboratory, National Institute of Standards and Technology, Gaithersburg, MD, USA \\
+              Department of Bioengineering, Stanford University, Stanford, CA, USA
+              \email{msalit@nist.gov}
 }
 
 \date{Received: date / Accepted: date}
@@ -119,7 +134,7 @@ The rapid adoption of microbial whole genome sequencing in public health, clinic
 
 %% add results, conclusions/ impact statement
 
-\keywords{First keyword \and Second keyword \and More}
+\keywords{Microbiology \and Whole genome sequencing \and Bioinformatics}
 % \PACS{PACS code1 \and PACS code2 \and more}
 % \subclass{MSC code1 \and MSC code2 \and more}
 \end{abstract}
