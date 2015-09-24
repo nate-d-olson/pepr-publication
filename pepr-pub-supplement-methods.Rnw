@@ -4,6 +4,7 @@
 \usepackage{csquotes}
 \usepackage{url}
 \usepackage{scrextend}
+\usepackage{textcomp}
 
 \usepackage{mathptmx} 
 
@@ -24,7 +25,7 @@ Sys.setenv(TEXINPUTS=getwd(),
 \maketitle
 
 \section{Material Development}
-Sequencing data for the NIST candidate reference material RM8376, genomic DNA from \emph{Staphylococcus aureus} strain NRS100 isolate COL (Biosample SAMN02854573) was selected as a model system to demonstrate how PEPR is used to characterize a microbial genomic material.  The strain was isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075). The genomic material represents a large homogeneous batch of extracted DNA, with 1500 vials each with $3\mu g$.  The extracted DNA was prepared from single colony of the initial culture stab was incubated overnight at 37°C on an agar plate and a single colony was used to inoculate a new plate. One colony from the new plate was grown in 20 mL Luria-Bertani (LB) broth at 37°C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37°C for 16 hours. DNA was isolated by lysing the bacteria in lysis solution containing NaCl, Tris, EDTA and lysostaphin ($25\mu g/ml$) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation. DNA was washed with 70\% alcohol, drained, and dissolved in TE buffer (Tris 10 mM, EDTA 0.1 mM, pH8.0).
+Sequencing data for the NIST candidate reference material RM8376, genomic DNA from \emph{Staphylococcus aureus} strain NRS100 isolate COL (Biosample SAMN02854573) was selected as a model system to demonstrate how PEPR is used to characterize a microbial genomic material.  The strain was isolated from a clinical sample by Children's National Hospital (Biosample SAMN02700075). The genomic material represents a large homogeneous batch of extracted DNA, with 1500 vials with $3\mu g$ DNA in each.  The extracted DNA was prepared from single colony of the initial culture stab was incubated overnight at 37 \textdegree C on an agar plate and a single colony was used to inoculate a new plate. One colony from the new plate was grown in 20 mL Luria-Bertani (LB) broth at 37 \textdegree C. The culture was used to inoculate 15 X 150 mm plates which were incubated at 37 \textdegree C for 16 hours. DNA was isolated by lysing the bacteria in a solution containing NaCl, Tris, EDTA and lysostaphin ($25\mu g/ml$) and SDS. Proteinase K and RNase A were used to treat protein and RNA. Ammonium acetate was used to remove protein. DNA was recovered by isopropanol precipitation as follows, the DNA was washed with 70\% alcohol, drained, and dissolved in TE buffer (Tris 10 mM, EDTA 0.1 mM, pH8.0).
 
 \section{Sequencing Experimental Design}
 The \emph{S. aureus} candidate reference materials were sequenced using three orthogonal sequencing platforms: Pacific Biosciences RSII (PacBio)\footnote{\label{pacbio}Pacific Biosciences of California Inc.\url{http://www.pacificbiosciences.com/} 1380 Willow Rd. Menlo Park, CA 94025 USA}, Ion Torrent PGM \footnote{\label{pgm}Life Technologies Corp., \url{http://www.iontorrent.com/} 7000 Shoreline Court \# 201, South San Francisco, CA 94080 USA}, and Illumina MiSeq \footnote{\label{illumina}Illumina Inc., \url{http://www.illumina.com/} 5200 Illumina Way San Diego, CA 92122 USA}. For PacBio sequencing, the sequencing library was prepared using DNA Template Prep Kit 3.0 with pooled DNA from three randomly sampled vials of the candidate reference material RM8376. The resulting library was sequenced with the P6-C4 chemistry.  
@@ -35,8 +36,8 @@ PacBio long read data were used to generate a \emph{de novo} genome assembly for
 
 \begin{figure}
 \includegraphics[width=\textwidth]{opgen_assembly_comparison.png}
-\label{fig:opgenCompFig}
 \caption{Comparison of optical map data to genome assembly. Alignment of \emph{in-silico} genome map generated from the PacBio HGAP assembly to the OpGen optical map.  Blue bars in map represent NocI restriction sites, black lines indicate co-linear regions.}
+\label{fig:opgenCompFig}
 \end{figure}
 
 \printbibliography

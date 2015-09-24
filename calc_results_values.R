@@ -46,4 +46,4 @@ max_lib_contam <- peprr:::.genomic_purity_df(peprDB, rm_genus) %>%
                             summarize(prop_contam = sum(Final.Guess)) %>% 
                             .$prop_contam %>% max(na.rm = TRUE)
 
-max_contam <- paste0(as.character(round(max_lib_contam,6) * 100),"%") # maximum contamination per dataset
+max_contam <- round(max_lib_contam,6) * 100 # maximum contamination per dataset
