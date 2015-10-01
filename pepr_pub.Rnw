@@ -175,7 +175,7 @@ pur_dat_id %>%
 @
 
 
-<< purityScatterFig, fig.align='center', fig.height=5, fig.width=6, fig.cap= "Comparison of base purity values for PGM and MiSeq. Positions are colored based of high and low purity values for the two sequencing platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM. A purity value of 0.99 was used to differentiate between high and low purity positions. Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
+<< purityScatterFig, fig.align='center', fig.height=5, fig.width=6, fig.ext='eps', fig.cap= "Comparison of base purity values for PGM and MiSeq. Positions are colored based of high and low purity values for the two sequencing platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM. A purity value of 0.99 was used to differentiate between high and low purity positions. Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
 ggplot2::ggplot(pur_dat_id_filt) +
      ggplot2::geom_point(ggplot2::aes(x = plat1, y = plat2, color = pur_group),
                          alpha = 0.5) +
@@ -187,7 +187,7 @@ ggplot2::ggplot(pur_dat_id_filt) +
 @
 
 
-<< purityPositionFig, fig.align='center', fig.height=6, fig.width=6, fig.cap= "Distribution of genome positions by purity group. Bases with high and low purity and purity values greater than and less than 0.99 repectively for the two platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM.  Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
+<< purityPositionFig, fig.align='center', fig.height=6, fig.width=6, fig.ext='eps', fig.cap= "Distribution of genome positions by purity group. Bases with high and low purity and purity values greater than and less than 0.99 respectively for the two platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM.  Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
 pur_dat_id_filt %>% filter(CHROM == chrom_names[1]) %>% 
     ggplot() + 
      geom_bar(aes(x = POS, fill = pur_group)) + 
@@ -212,12 +212,12 @@ xtable(homogeneity_sig_table(peprDB, rename_cols = TRUE),
 Short read sequencing data was used to identify the proportion of DNA in the material from an organism other than the material genus, in this case \textit{Staphylococcus}, using PathoScope 2.0 \cite{Hong2014} . Based on analysis of the MiSeq and PGM sequencing data, the reference material has minimal if any genomic contaminants (Fig. \ref{fig:contamCountsFig}), with a maximum of \Sexpr{max_contam} \% reads in any dataset classified as not belonging to the genus \textit{Staphylococcus}. The most abundant contaminant was \textit{Escherichia coli} (Fig. \ref{fig:contamTaxaFig}).  
 
 
-<<contamCountsFig, fig.align = "center", fig.lp = "fig:", fig.height=4, fig.width=4, fig.cap= "Proportion of reads from contaminant DNA. Reads categorized as genomic contaminants as classified by PathoScope as not beloning to the genus \\textit{Staphloococcus}.">>=
+<<contamCountsFig, fig.align = "center", fig.lp = "fig:", fig.height=4, fig.width=4, fig.ext='eps', fig.cap= "Proportion of reads from contaminant DNA. Reads categorized as genomic contaminants as classified by PathoScope as not belonging to the genus \\textit{Staphylococcus}.">>=
 contam_counts_figure(peprDB, rm_genus)
 @
 
 
-<<contamTaxaFig, fig.align = "center", fig.lp = "fig:", fig.height=6, fig.width=6, fig.cap= "Breakdown of contaminants by organism.">>=
+<<contamTaxaFig, fig.align = "center", fig.lp = "fig:", fig.height=6, fig.width=6, fig.ext='eps', fig.cap= "Breakdown of contaminants by organism.">>=
 contam_point_line_figure(peprDB, rm_genus) + theme(axis.text.y = element_text(face = "italic"))
 @
 
