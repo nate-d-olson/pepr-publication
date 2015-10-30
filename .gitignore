@@ -18,3 +18,5 @@ pepr-pub.tex
 *.log
 *.run.xml
 *.synctex.gz
+
+*.eps
