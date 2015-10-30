@@ -7,6 +7,7 @@
 %\documentclass{svjour3}                     % onecolumn (standard format)
 %\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
 \documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[smallextended]{svjourNDO}       % onecolumn (reduced margins)
 %\documentclass[twocolumn]{svjour3}          % twocolumn
 %
 \smartqed  % flush right qed marks, e.g. at end of proof
@@ -112,11 +113,11 @@ Well-characterized, homogeneous, and stable genomic materials can be used to eva
 PEPR consists of three bioinformatic pipelines written in python (Fig. \ref{fig:workflowFig}).  The three bioinformatic pipelines are genome evaluation, genome characterization, and genomic purity. A YAML file (\url{http://yaml.org}) is used to define pipeline inputs. The pipeline coordinates the execution of a number of commandline tools, logging the standard output and standard error for each executed command in time-stamped files for reference and debugging. Pipeline code is available at (\url{https://github.com/usnistgov/pepr}). To reduce the barrier for reuse, two Docker (\url{https://www.docker.com/}) containers are available with pre-installed pipeline dependencies. Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments and can be run on any desktop, cloud, or high performance computing environment, regardless of the operating system. The \texttt{pepr} container (\url{https://registry.hub.docker.com/u/natedolson/pepr}) includes dependencies for the genome evaluation and characterization pipelines, excluding the Genome Analysis Toolkit (due to licensing restrictions). The \texttt{docker-pathoscope} container has dependencies for the genomic purity pipeline installed(\url{https://registry.hub.docker.com/u/natedolson/docker-pathoscope/}).
 
 
-\begin{figure}
+\begin{figure*}
 \includegraphics[width=\textwidth]{pepr-workflow.png}
 \label{fig:workflowFig}
 \caption{PEPR workflow. White objects are pipeline inputs, grey objects are the three pipeline components, light blue objects are the pipeline products.}
-\end{figure}
+\end{figure*}
 
 A software package, \texttt{peprr}, was developed for the statistical computing language R \cite{R2015} to compile the output from the genome evaluation, characterization, and genomic purity pipelines . The compiled data was formated into a series of data tables within a SQLite, \texttt{peprDB}, database to facilitate downstream analysis \cite{wickham2014tidy}.  The package includes functions to generate a number of summary tables and figures, including those in this publication.
 
@@ -162,7 +163,7 @@ source("base_purity_analysis.R")
 A base purity metric was used to evaluate the degree to which the sequencing data supports the reference base call.  We compared purity metric values between two orthogonal sequencing methods, MiSeq and PGM, for all positions in the genome (Fig. \ref{fig:purityScatterFig}). Positions with purity metric values greater than 99 \% were categorized as high purity and less than 99 \% low purity. Out of \Sexpr{total_pos} positions in the genome \Sexpr{pos_pur_gt99_both} positions had purity values greater than 99 \% for both short read sequencing platforms (Table \ref{Table:purityTable}).  Further, \Sexpr{pos_pur_gt99_one} and \Sexpr{pos_pur_gt97_one} positions had purity values greater than 99 \% and 97 \%, respectively, for one of the two platforms.  Only \Sexpr{pos_pur_lt99_both} positions had a purity values less than 99 \% for both platforms, and no positions had a purity value less than \Sexpr{min_max_pur_position} \% for both platforms. The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (Fig. \ref{fig:purityPositionFig}).  
 
 
-<< purityTable, results='asis' >>=
+<< purityTable, results='asis'>>=
 peprDB <- dplyr::src_sqlite(db_path)
 pur_dat_id %>% 
     group_by(pur_group) %>% 
@@ -262,7 +263,7 @@ PEPR provides a framework for characterizing microbial genomic reference materia
 
 
 \begin{acknowledgements}
-The author’s would like to thank Jenny McDaniel, Lindsay Vang, and David Catoe for performing the MiSeq and PGM sequencing, and Tim Muruvanda for performing the PacBio sequencing. Additionally, we would like to thank Drs. Nancy Lin and Steven Lund for converations and suggestions while developing PEPR and drafting the manuscript. This work was supported by the Department of Homeland Security (DHS) Science and Technology Directorate under the Interagency Agreement HSHQPM-14-X-00078 with NIST and by two interagency agreements with the FDA. Opinions expressed in this paper are the authors’ and do not necessarily reflect the policies and views of the DHS, NIST, or affiliated venues. Certain commercial equipment, instruments, or materials are identified in this paper only to specify the experimental procedure adequately. Such identification is not intended to imply recommendation or endorsement by the NIST, nor is it intended to imply that the materials or equipment identified are necessarily the best available for the purpose.
+The author’s would like to thank Jenny McDaniel, Lindsay Vang, and David Catoe for performing the MiSeq and PGM sequencing, and Tim Muruvanda for performing the PacBio sequencing. Additionally, we would like to thank Drs. Nancy Lin and Steven Lund for converations and suggestions while developing PEPR and drafting the manuscript. Department of Homeland Security (DHS) Science and Technology Directorate funded this project under Interagency Agreement HSHQPM-14-X-00078 with NIST. This work was additionally supported by two interagency agreements between NIST and the FDA. Opinions expressed in this paper are the authors’ and do not necessarily reflect the policies and views of the DHS, NIST, or affiliated venues. Certain commercial equipment, instruments, or materials are identified in this paper only to specify the experimental procedure adequately. Such identification is not intended to imply recommendation or endorsement by the NIST, nor is it intended to imply that the materials or equipment identified are necessarily the best available for the purpose.
 Official contribution of NIST; not subject to copyrights in USA.
 \end{acknowledgements}
 
