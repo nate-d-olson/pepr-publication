@@ -10,4 +10,4 @@ strain_source <- "Children's National Hostipal."
 rm_genome_size <- 2.8*10^6
 
 # Database location
-db_path <- "~/Desktop/MG002.sqlite"
+db_path <- "/Volumes/Transcend/MG002.sqlite"
