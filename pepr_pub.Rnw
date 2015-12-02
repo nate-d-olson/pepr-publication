@@ -93,9 +93,10 @@ opts_chunk$set(message=FALSE, warning=FALSE, echo = FALSE)
 
 \begin{abstract}
 The rapid adoption of microbial whole genome sequencing in public health, clinical testing, and forensic laboratories requires the use of validated measurement processes. 
-Reference materials that are well characterized, homogeneous, and stable can be used to evaluate measurement processes and help to establish confidence in the results. 
-Given the variety of microbial genome sequencing applications and platforms, as well as the vast microbial genomic diversity, there is a need for application-specific genomic materials for method validation. 
-We have developed a reproducibile and transparent bioinformatics tool for characterizing prokaryotic genomic materials; "PEPR", Pipelines for Evaluating Prokaryotic References. 
+Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes and help to establish confidence in microbal whole genome sequencing results. 
+We have developed a reproducibile and transparent bioinformatics tool for characterizing the reference genome of prokaryotic genomic material; "PEPR", Pipelines for Evaluating Prokaryotic References. 
+PEPR evaluates the overall quality of a user provided reference genome, assesses genomic purity by checking for DNA contaminants, and characterizes the homogeneity and purity of the genomic material's reference genome by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
+PEPR is open source and available at \url{https://github.com/usnistgov/pepr}. 
 We demonstrate the tool and its output using using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material.
 
 
@@ -139,7 +140,7 @@ Pipeline code is available at (\url{https://github.com/usnistgov/pepr}).
 To reduce the barrier for reuse, two Docker (\url{https://www.docker.com/}) containers are available with pre-installed pipeline dependencies. 
 Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments and can be run on any desktop, cloud, or high performance computing environment, regardless of the operating system. 
 The \texttt{pepr} container (\url{https://registry.hub.docker.com/u/natedolson/pepr}) includes dependencies for the genome evaluation and characterization pipelines, excluding the Genome Analysis Toolkit (due to licensing restrictions). 
-The \texttt{docker-pathoscope} container has dependencies for the genomic purity pipeline installed(\url{https://registry.hub.docker.com/u/natedolson/docker-pathoscope/}).
+The \texttt{docker-pathoscope} container has dependencies for the genomic purity pipeline installed (\url{https://registry.hub.docker.com/u/natedolson/docker-pathoscope/}).
 
 
 \begin{figure*}
@@ -174,7 +175,8 @@ The PacBio sequencing data is mapped to the reference genome using the BWA mem a
 After refining the alignment files, base level analysis is performed using the short read sequencing data. 
 For each platform a VCF (variant call format) file with a number of summary statistics is generated using SAMtools mpileup \cite{Li2009}. 
 A base purity metric is calculated from the resulting VCF files. 
-The base purity metric is the number of bases in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads supporting the alternate base called by SAMtools at that genome position. 
+The base purity metric is the number of high-quality bases (quality score $\geq$ 20) in reads aligned to a genome position that are in agreement with the reference base divided by the total number of reads high-quality bases supporting the reference and alternate base called by SAMtools. 
+The metric is calculated from the SAMtools DP4 INFO tag in the vcf output generated with the mpileup command.
 Homogeneity analysis, a measure of genomic content similarity between vials of the reference material, is performed by first generating a pileup file using SAMtools mpileup for each dataset then performing pairwise tumor-normal variant calling using VarScan \cite{Koboldt2009}. 
 In this work, VarScan looks specifically for differences between vials in the proportion of reads containing variants. 
 A standard Benjamini-Hochberg procedure was used to assess the power of the homogeneity analysis (Supplemental Material, \url{https://github.com/DanSBS/NGSPower}). 
@@ -232,10 +234,10 @@ source("base_purity_analysis.R")
 
 
 A base purity metric was used to evaluate the degree to which the sequencing data supports the reference base call. 
-We compared purity metric values between two orthogonal sequencing methods, MiSeq and PGM, for all positions in the genome (Fig. \ref{fig:purityScatterFig}). Positions with purity metric values greater than 99 \% were categorized as high purity and less than 99 \% low purity. 
-Out of \Sexpr{total_pos} positions in the genome \Sexpr{pos_pur_gt99_both} positions had purity values greater than 99 \% for both short read sequencing platforms (Table \ref{Table:purityTable}). 
-Further, \Sexpr{pos_pur_gt99_one} and \Sexpr{pos_pur_gt97_one} positions had purity values greater than 99 \% and 97 \%, respectively, for one of the two platforms. 
-Only \Sexpr{pos_pur_lt99_both} positions had a purity values less than 99 \% for both platforms, and no positions had a purity value less than \Sexpr{min_max_pur_position} \% for both platforms. 
+We compared purity metric values between two orthogonal sequencing methods, MiSeq and PGM, for all positions in the genome (Fig. \ref{fig:purityScatterFig}). Positions with purity metric values greater than 0.99 were categorized as high purity and less than 0.99 low purity. 
+Out of \Sexpr{total_pos} positions in the genome \Sexpr{pos_pur_gt99_both} positions had purity values greater than 0.99 for both short read sequencing platforms (Table \ref{Table:purityTable}). 
+Further, \Sexpr{pos_pur_gt99_one} and \Sexpr{pos_pur_gt97_one} positions had purity values greater than 0.99 and 0.97, respectively, for one of the two platforms. 
+Only \Sexpr{pos_pur_lt99_both} positions had a purity values less than 0.99 for both platforms, and no positions had a purity value less than \Sexpr{min_max_pur_position} for both platforms. 
 The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (Fig. \ref{fig:purityPositionFig}). 
 
 
@@ -287,6 +289,7 @@ xtable(homogeneity_sig_table(peprDB, rename_cols = TRUE),
 @
 
 
+% revise genomic purity values for consistency
 \subsection{Genomic Purity Pipeline}
 Short read sequencing data was used to identify the proportion of DNA in the material from an organism other than the material genus, in this case \textit{Staphylococcus}, using PathoScope 2.0 \cite{Hong2014}. 
 Based on analysis of the MiSeq and PGM sequencing data, the reference material has minimal if any genomic contaminants (Fig. \ref{fig:contamCountsFig}), with a maximum of \Sexpr{max_contam} \% reads in any dataset classified as not belonging to the genus \textit{Staphylococcus}. The most abundant contaminant was \textit{Escherichia coli} (Fig. \ref{fig:contamTaxaFig}). 
