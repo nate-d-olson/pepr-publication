@@ -17,11 +17,14 @@
 \usepackage[english]{babel}
 \usepackage{csquotes}
 %
-\usepackage[backend=bibtex]{biblatex}
-\addbibresource{pepr-pub.bib}
+%\usepackage[backend=bibtex]{biblatex}
+%\usepackage[backend=bibtex]{natbib}
+
+%\usepackage[super,comma,sort&compress]{natbib}
+%\addbibresource{pepr-pub.bib}
 <<setup, include=FALSE, cache=FALSE, echo=FALSE>>=
 Sys.setenv(TEXINPUTS=getwd(),
-           BIBINPUTS=getwd(),
+         BIBINPUTS=getwd(),
            BSTINPUTS=getwd())
 @
 
@@ -171,7 +174,7 @@ The Genome Characterization Pipeline uses replicate sequence dataset from multip
 Illumina data are aligned to the reference genome using the same methods as the \texttt{evaluation} pipeline. 
 IonTorrent PGM data using the TMAP algorithm \cite{Homer}. 
 Additionally, if Pacific Biosciences (PacBio) sequencing data is used to generate the input reference assembly. 
-The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c} and  Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deleltion using the GenomeAnalysisToolKit \cite{McKenna2010, DePristo12011}. 
+The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c} and  Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deleltion using the GenomeAnalysisToolKit \cite{McKenna2010, DePristo2011}. 
 After refining the alignment files, base level analysis is performed using the short read sequencing data. 
 For each platform a VCF (variant call format) file with a number of summary statistics is generated using SAMtools mpileup \cite{Li2009}. 
 A base purity metric is calculated from the resulting VCF files. 
@@ -345,9 +348,9 @@ Based on analysis of the MiSeq and PGM sequencing data, the reference material h
 
  The Genomic Purity Pipeline is used to identify DNA within the material that belongs to a genus other than the material genus. 
  The genus level cutoff was selected based on results from a previous study characterizing the specificity of the PathoScope 2.0 classification algorithm (Olson et al. \textit{in-prep}). 
- Genomic contaminants can be from the culture itself or reagents and materials used to prepare the material or during sequencing \cite{Shrestha2013, Tang2003, Salter2014}. 
+ Genomic contaminants can be from the culture itself or reagents and materials used to prepare the material or during sequencing \cite{Shrestha2013,Tang2003,Salter2014}. 
  Contaminants identified by the Genomic Purity Pipeline may not be present in the material. 
- For example reagents used during library preparation may also include contaminants \cite{Tanner1998, Newsome2004, Motley2014, Salter2014}. 
+ For example reagents used during library preparation may also include contaminants \cite{Tanner1998,Newsome2004,Motley2014,Salter2014}. 
  Additionally, bioinformatic errors may lead to false positive contaminants, either due to errors in the database or bioinformatic errors by classification algorithm. 
  Genomic purity analysis of the \textit{S. aureus} material identified a number of candidate contaminants,  the most abundant of which was \textit{E. coli}. 
  \textit{E. coli} is a well documented contaminant of molecular biology reagents, and not likely a true contaminant \cite{Salter2014}. Lower abundant contaminants maybe bioinformatic errors and not true contaminants. 
@@ -378,7 +381,10 @@ The author’s would like to thank Jenny McDaniel, Lindsay Vang, and David Catoe
 Official contribution of NIST; not subject to copyrights in USA.
 \end{acknowledgements}
 
-\printbibliography
+
+\bibliographystyle{vancouver}
+\bibliography{pepr-pub}
+%\printbibliography
 
 \end{document}
 % end of file pepr_pub.tex
