@@ -96,11 +96,14 @@ opts_chunk$set(message=FALSE, warning=FALSE, echo = FALSE)
 
 \begin{abstract}
 The rapid adoption of microbial whole genome sequencing in public health, clinical testing, and forensic laboratories requires the use of validated measurement processes. 
-Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes and help to establish confidence in microbal whole genome sequencing results. 
-We have developed a reproducibile and transparent bioinformatics tool for characterizing the reference genome of prokaryotic genomic material; "PEPR", Pipelines for Evaluating Prokaryotic References. 
-PEPR evaluates the overall quality of a user provided reference genome, assesses genomic purity by checking for DNA contaminants, and characterizes the homogeneity and purity of the genomic material's reference genome by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
+Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes, improving confidence in microbal whole genome sequencing results. 
+We have developed a reproducibile and transparent bioinformatics tool, "PEPR", Pipelines for Evaluating Prokaryotic References, for characterizing the reference genome of prokaryotic genomic materials. 
+PEPR evaluates the quality, purity, and homogeneity of the reference material genome, and purity of the genomic material.
+The quality of the genome is evaluated using high coverage paired-end sequence data; coverage, paired-end read size and direction, as well as soft-clipping rates are used to identify missassemblies. 
+The homogeneity and purity of the material relative to the reference genome is characterized by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
+The genomic purity of the material is assessed by checking for DNA contaminants.
+We demonstrate the tool and its output using using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material. 
 PEPR is open source and available at \url{https://github.com/usnistgov/pepr}. 
-We demonstrate the tool and its output using using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material.
 
 
 \keywords{Microbiology \and Whole genome sequencing \and Bioinformatics}
