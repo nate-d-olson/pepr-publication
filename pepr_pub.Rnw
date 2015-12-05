@@ -96,14 +96,14 @@ opts_chunk$set(message=FALSE, warning=FALSE, echo = FALSE)
 
 \begin{abstract}
 The rapid adoption of microbial whole genome sequencing in public health, clinical testing, and forensic laboratories requires the use of validated measurement processes. 
-Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes, improving confidence in microbal whole genome sequencing results. 
-We have developed a reproducibile and transparent bioinformatics tool, "PEPR", Pipelines for Evaluating Prokaryotic References, for characterizing the reference genome of prokaryotic genomic materials. 
+Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes, improving confidence in microbial whole genome sequencing results. 
+We have developed a reproducible and transparent bioinformatics tool, "PEPR", Pipelines for Evaluating Prokaryotic References, for characterizing the reference genome of prokaryotic genomic materials. 
 PEPR evaluates the quality, purity, and homogeneity of the reference material genome, and purity of the genomic material.
-The quality of the genome is evaluated using high coverage paired-end sequence data; coverage, paired-end read size and direction, as well as soft-clipping rates are used to identify missassemblies. 
-The homogeneity and purity of the material relative to the reference genome is characterized by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
+The quality of the genome is evaluated using high coverage paired-end sequence data; coverage, paired-end read size and direction, as well as soft-clipping rates, are used to identify misassemblies. 
+The homogeneity and purity of the material relative to the reference genome are characterized by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
 The genomic purity of the material is assessed by checking for DNA contaminants.
-We demonstrate the tool and its output using using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material. 
-PEPR is open source and available at \url{https://github.com/usnistgov/pepr}. 
+We demonstrate the tool and its output using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material. 
+PEPR is open source and available at \url{https://github.com/usnistgov/pepr}.
 
 
 \keywords{Microbiology \and Whole genome sequencing \and Bioinformatics}
@@ -113,38 +113,26 @@ PEPR is open source and available at \url{https://github.com/usnistgov/pepr}.
 
 \section{Introduction}
 \label{intro}
-Over the past decade, the availability of affordable and rapid Next-Generation Sequencing (NGS) technology has revolutionized the field of microbiology. 
-Arguably the most discriminatory typing method available, whole genome sequencing (WGS), has been adopted not only by the research community, but also by public health laboratories, clinical testing laboratories, and the forensic community. 
-High stakes decisions are often made based on the outcome of a WGS assay. 
-To increase confidence in WGS assay results a critical assessment of the errors inherent to the measurement processes is required. 
-A number of sources of error associated with the WGS measurement process have been identified, but the degree to which they can be predicted, controlled, or compensated varies significantly \cite{Olson2015}. 
+The rapid adoption of microbial whole genome sequencing in public health, clinical testing, and forensic laboratories requires the use of validated measurement processes. 
+Well characterized, homogeneous, and stable microbial genomic reference materials can be used to evaluate measurement processes, improving confidence in microbial whole genome sequencing results. 
+We have developed a reproducible and transparent bioinformatics tool, "PEPR", Pipelines for Evaluating Prokaryotic References, for characterizing the reference genome of prokaryotic genomic materials. 
+PEPR evaluates the quality, purity, and homogeneity of the reference material genome, and purity of the genomic material.
+The quality of the genome is evaluated using high coverage paired-end sequence data; coverage, paired-end read size and direction, as well as soft-clipping rates, are used to identify misassemblies. 
+The homogeneity and purity of the material relative to the reference genome are characterized by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
+The genomic purity of the material is assessed by checking for DNA contaminants.
+We demonstrate the tool and its output using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material. 
+PEPR is open source and available at \url{https://github.com/usnistgov/pepr}. 
 
-
-Well-characterized, homogeneous, and stable genomic materials can be used to evaluate methods and aid in establishing confidence in results from a measurement process. 
-For example, we recently characterized a whole human genome reference material (National Institute of Standards and Technology, NIST, Reference Material 8398) to assess performance of variant calling in human genomic samples \cite{Zook2014}, but no reference materials for microbial sequencing currently exist. 
-Four microbial genomic DNA candidate reference materials are being developed at the National Institute of Standards and Technology (NIST) to meet this need. 
-When considering the extensive genomic diversity of prokaryotic organisms as well as the rapidly evolving and diverse DNA sequencing applications, we envision the need for a wide variety of application-specific genomic materials for use in method validation and benchmarking. 
-Currently, many laboratories and sequencing centers are using in-house materials as part of a regular method validation and quality control system. 
-However, the degree to which these materials are characterized varies significantly, and therefore a common pipeline for characterizing prokaryotic genomic materials is needed.
-
-
-“PEPR”, Pipelines for Evaluating Prokaryotic References, a set of reproducible and transperent bioinformatic pipelines, was developed to characterize genomic materials for use in WGS method validation. 
-Using the pipeline increases confidence in method validation through the ability to develop better characterized control materials. 
-PEPR characterizes prokaryotic genomic material for purity and homogeneity of the genome sequence, as well as presence of genomic material other than the material genus. 
-The general approach to material characterization that guided the development of PEPR is the use of orthogonal sequencing methods along with technical replicates to obtain consensus values for the characterized properties. 
-These consensus values are our best current estimates of the true values. 
-We do not assert probabilistic estimates of confidence or confidence classification values with the sequence data, as we lack good models of biases or systematic errors of current sequencing technologies. 
-Here we will first describe PEPR then show how PEPR was used to characterize NIST \textit{Staphloyoccous aureus} genomic DNA candidate reference reference material.
 
 \section{Methods}
 \subsection{Pipelines for Evaluating Prokaryotic References: PEPR}
 PEPR consists of three bioinformatic pipelines written in python (Fig. \ref{fig:workflowFig}). 
 The three bioinformatic pipelines are genome evaluation, genome characterization, and genomic purity. 
 A YAML file (\url{http://yaml.org}) is used to define pipeline inputs. 
-The pipeline coordinates the execution of a number of commandline tools, logging the standard output and standard error for each executed command in time-stamped files for reference and debugging. 
+The pipeline coordinates the execution of a number of command line tools, logging the standard output and standard error for each executed command in time-stamped files for reference and debugging. 
 Pipeline code is available at (\url{https://github.com/usnistgov/pepr}). 
 To reduce the barrier for reuse, two Docker (\url{https://www.docker.com/}) containers are available with pre-installed pipeline dependencies. 
-Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments and can be run on any desktop, cloud, or high performance computing environment, regardless of the operating system. 
+Docker is a lightweight virtual environment that facilitates the sharing and distribution of computing environments and can be run on any desktop, cloud, or high-performance computing environment, regardless of the operating system. 
 The \texttt{pepr} container (\url{https://registry.hub.docker.com/u/natedolson/pepr}) includes dependencies for the genome evaluation and characterization pipelines, excluding the Genome Analysis Toolkit (due to licensing restrictions). 
 The \texttt{docker-pathoscope} container has dependencies for the genomic purity pipeline installed (\url{https://registry.hub.docker.com/u/natedolson/docker-pathoscope/}).
 
@@ -157,13 +145,13 @@ The \texttt{docker-pathoscope} container has dependencies for the genomic purity
 
 
 A software package, \texttt{peprr}, was developed for the statistical computing language R \cite{R2015} to compile the output from the genome evaluation, characterization, and genomic purity pipelines. 
-The compiled data was formated into a series of data tables within a SQLite, \texttt{peprDB}, database to facilitate downstream analysis \cite{wickham2014tidy}. 
+The compiled data was formatted into a series of data tables within an SQLite, \texttt{peprDB}, database to facilitate downstream analysis \cite{wickham2014tidy}. 
 The package includes functions to generate a number of summary tables and figures, including those in this publication.
 
 
 \subsection{Genome Evaluation Pipeline}
 \label{method:2}
-The Genome Evaluation Pipeline, is the first step in the PEPR workflow, and is used to reduce errors in the user provided genome assembly prior to characterization. 
+The Genome Evaluation Pipeline is the first step in the PEPR workflow and is used to reduce errors in the user provided genome assembly prior to characterization. 
 The \texttt{evaluation} pipeline consists of three steps. 
 Illumina sequencing data are retrieved from the Genbank Sequence Read Archive (SRA) using the sratoolkit \texttt{fastq-dump} command (\url{http://ncbi.github.io/sra-tools/}). 
 Next, sequencing reads are mapped to the reference genome using BWA mem algorithm \cite{Li2013c}. 
@@ -177,7 +165,7 @@ The Genome Characterization Pipeline uses replicate sequence dataset from multip
 Illumina data are aligned to the reference genome using the same methods as the \texttt{evaluation} pipeline. 
 IonTorrent PGM data using the TMAP algorithm \cite{Homer}. 
 Additionally, if Pacific Biosciences (PacBio) sequencing data is used to generate the input reference assembly. 
-The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c} and  Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deleltion using the GenomeAnalysisToolKit \cite{McKenna2010, DePristo2011}. 
+The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c} and  Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deletion using the GenomeAnalysisToolKit \cite{McKenna2010, DePristo2011}. 
 After refining the alignment files, base level analysis is performed using the short-read sequencing data. 
 For each platform a VCF (variant call format) file with a number of summary statistics is generated using SAMtools mpileup \cite{Li2009}. 
 A base purity metric is calculated from the resulting VCF files. 
@@ -194,16 +182,15 @@ Additionally, a number of summary statistics are calculated for the sequencing d
 The Genomic Purity Pipeline assesses the purity of the genomic material, in terms of the presence of DNA from sources other than the expected genus was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 \cite{Hong2014}. 
 This method uses an expectation maximization algorithm where the sequence data are first mapped to a database comprised of all sequence data in the Genbank nt database. 
 Then, through an iterative process PathoScope re-assigns ambiguously mapped reads to a taxonomic group based on the proportion of reads mapped unambiguously to individual taxonomic groups in the database. 
-Using short-read sequencing data as input PathoScope 2.0 first filters and trims low quality reads (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 \cite{Langmead2012}), then the expectation-maximization algorithm (PathoID) is used for the taxonomic classification. 
+Using short-read sequencing data as input PathoScope 2.0 first filters and trims low-quality reads (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 \cite{Langmead2012}), then the expectation-maximization algorithm (PathoID) is used for the taxonomic classification. 
 The annotated Genbank nt database provided by the PathoScope developers was used as the reference database (\url{ftp://pathoscope.bumc.bu.edu/data/nt_ti.fa.gz}). 
 
 
 \subsection{Candidate Reference Material \textit{S. aureus} Sequencing Data}
 Sequencing data and the reference assembly for the NIST candidate reference material \textit{S. aureus} was used to demonstrate how PEPR is used to characterize a genomic material. 
 A \textit{de novo} genome assembly from Pacific Biosciences (PacBio) long read sequencing data was used as input for PEPR. 
-Prior to being used as input the assembly was validated using optical mapping data. 
-Eight replicate vials of the candidate reference material was sequened on the Illumina MiSeq and Ion Torrent PGM sequencing platforms (Supplemental Methods).
-
+Prior to being used as input, the assembly was validated using optical mapping data. 
+Eight replicate vials of the candidate reference material were sequenced on the Illumina MiSeq and Ion Torrent PGM sequencing platforms (Supplemental Methods).
 
 \section{Results and Discussion}
 Pipelines for Evaluating Prokaryotic References (PEPR) is designed to use biological and technical replicate sequencing data from orthogonal sequencing platforms to characterize a microbial material's genome. 
@@ -216,7 +203,7 @@ The three pipelines are discussed below results from characterizing the NIST \te
 
 
 \subsection{Preparation of Reference Assembly} 
-Prior to running PEPR a high quality genome is required. 
+Prior to running PEPR, a high-quality genome is required. 
 For the \textit{S. aureus} RM the reference assembly was constructed from Pacific Biosciences RSII long read sequencing data. 
 To validate the \textit{S. aureus} reference genome prior to evaluating with PEPR, a whole genome map was generated with the OpGen optical mapping technology. 
 The long DNA fragments (average size \textgreater 200 Mb) allow for the evaluation of large misassemblies (\textgreater 3 kb) that are not easily identified using short-read sequencing data \cite{Mendelowitz2014}. 
@@ -227,12 +214,12 @@ The PEPR \textit{Genome Evaluation} pipeline provides an automated method for ev
 \subsection{Genome Evaluation}
 The first step in PEPR is the \textit{Genome Evaluation} pipeline. 
 Pilon was chosen for the evaluation step as it assesses the accuracy of the genome and corrects errors in the assembly. 
-Other methods are available for evaluating reference genomes, e.g. amosValidate \cite{Phillippy2008} and ALE \cite{Clark2013}, however these methods only assess assembly accuracy without correcting missassemblies. 
+Other methods are available for evaluating reference genomes, e.g. amosValidate \cite{Phillippy2008} and ALE \cite{Clark2013}, however these methods only assess assembly accuracy without correcting misassemblies. 
 \emph{ADD DISCUSSION OF PAGIT AND REAPR POTENTIALLY OTHER ASSEMBLY VALIDATION METHODS}
 The resulting reference assembly represents the consensus genome of the population of cells used to generate the material. 
-The genome evaluation pipeline does not attempt to identify or characterize low frequency structural variants within the material or vial-to-vial variability of the reference genome. 
+The genome evaluation pipeline does not attempt to identify or characterize low-frequency structural variants within the material or vial-to-vial variability of the reference genome. 
 The evaluation pipeline failed to identify any assembly or base call errors in the \textit{S. aureus} candidate genome assembly. 
-The candidate genome, once evaluated, and if nessessary refined during the \textit{Genome Evaluation} pipeline, is used as input for the \texit{Genome Characterization} step. 
+The candidate genome, once evaluated, and if necessary refined during the \textit{Genome Evaluation} pipeline, is used as input for the \texit{Genome Characterization} step. 
 
 
 \subsection{Genome Characterization}
@@ -299,13 +286,13 @@ pur_dat_id %>%
 @
 
 
-Through comparison of the base purity for two orthogonal sequencing methods we identified genome positions with low purity values due to platform specific systematic sequencing errors. 
+Through comparison of the base purity for two orthogonal sequencing methods, we identified genome positions with low purity values due to platform specific systematic sequencing errors. 
 The reference base is identified using a third orthogonal sequencing method (Pacific Biosciences RSII), which only chooses the dominant base and does not identify small impurities. 
 Thus, a low purity (below 50 \%) for one of the two short-read sequencing platforms and a high purity value for the other means that two technologies (one short-read and one long read) agree that the dominant base is the reference base. 
 It is also important to acknowledge that even if the two short-read sequencing platforms indicate an impurity, they are potentially susceptible to the same unknown bias. 
-The sequencing technologies used to characterize the material are still maturing and an incomplete understanding of platform specific biases limits our ability to provide a confidence value for the base calls. 
+The sequencing technologies used to characterize the material are still maturing and an incomplete understanding of platform-specific biases limits our ability to provide a confidence value for the base calls. 
 A number of base level metrics, such as strand bias, are calculated as part of the PEPR Genome Characterization Pipeline and are included in the pipeline results database. These metrics can be used to differentiate positions with low purity due to measurement error and those due to biological variability. 
-Use of additional metrics and algorithms developed for the identification of low frequency variants, such as loFreq \cite{Wilm2012}, could help identify positions with low levels of biological variability, but are not currently implemented in PEPR. 
+Use of additional metrics and algorithms developed for the identification of low-frequency variants, such as loFreq \cite{Wilm2012}, could help identify positions with low levels of biological variability, but are not currently implemented in PEPR. 
 
 
 << purityScatterFig, fig.align='center', fig.height=5, fig.width=6, fig.ext='eps', fig.cap= "Comparison of base purity values for PGM and MiSeq. Positions are colored based of high and low purity values for the two sequencing platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM. A purity value of 0.99 was used to differentiate between high and low purity positions. Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
@@ -332,9 +319,9 @@ pur_dat_id_filt %>% filter(CHROM == chrom_names[1]) %>%
 
 \subsubsection{Base Level Homogeneity}
 The genomic material homogeneity was assessed through pairwise statistical analysis of the replicate MiSeq datasets using the VarScan somatic variant caller \cite{Koboldt2009}. 
-The pairwise variant analysis failed to identify any statistically significant base level differences among the replicates (Table \ref{Table:homogeneityTable}).
+The pairwise variant analysis failed to identify any statistically significant base level differences among the replicates (Table \ref{Table: homogeneityTable}).
 Only Illumina data was used to assess the homogeneity of the material as the higher coverage increased the statistical power of the test, and replicate libraries provide information regarding the method error rate. 
-The Ion Torrent dataset did not include replicate libraries for the eight vials sequenced and therefore library specific sequencing errors were confounded with vial to vial variability. 
+The Ion Torrent dataset did not include replicate libraries for the eight vials sequenced and, therefore, library specific sequencing errors were confounded with vial-to-vial variability. 
 No statistically significant variants were identified between all pairwise comparisons indicating that the material is homogeneous. 
 If potential inhomogeneities were found, then the PGM sequencing data could be examined for additional support for the inhomogeneities. 
 Even without replicate libraries for the different vials it is unlikely that any library specific bias will correlate with vial-to-vial variability observed in the Illumina data by chance.
@@ -342,7 +329,7 @@ Even without replicate libraries for the different vials it is unlikely that any
 
 << homogeneityTable, results="asis">>=
 xtable(homogeneity_sig_table(peprDB, rename_cols = TRUE),
-       caption = "Pairwise variant analysis results. Position is the position in the genome where differences in variant frequency for a least one of the 16 pairwise comparisons were reported. Proportion of pairs is the fraction of the pairwise comparisons between the 16 Illumina MiSeq datasets where a difference in the variant frequency was reported by VarScan. Median frequency is the median variant frequency for the datasets were a difference in the variant frequency was reported. Minimum P-value is the lowest p-value reported by VarScan for all pairwise dataset comparisons where a difference in variant frequency was reported. N Significant is the number of datasets where a reported difference was statistically significant at the genome position.", label = "Table:homogeneityTable")  %>% 
+       caption = "Pairwise variant analysis results. Position is the position in the genome where differences in variant frequency for a least one of the 16 pairwise comparisons were reported. Proportion of pairs is the fraction of the pairwise comparisons between the 16 Illumina MiSeq datasets where a difference in the variant frequency was reported by VarScan. Median frequency is the median variant frequency for the datasets were a difference in the variant frequency was reported. Minimum P-value is the lowest p-value reported by VarScan for all pairwise dataset comparisons where reported variant frequency differences. N Significant is the number of datasets where a reported difference was statistically significant at the genome position.", label = "Table:homogeneityTable")  %>% 
     print(include.rownames = FALSE)
 @
 
@@ -357,11 +344,11 @@ Based on analysis of the MiSeq and PGM sequencing data, the reference material h
  Genomic contaminants can be from the culture itself or reagents and materials used to prepare the material or during sequencing \cite{Shrestha2013,Tang2003,Salter2014}. 
  Contaminants identified by the Genomic Purity Pipeline may not be present in the material. 
  For example reagents used during library preparation may also include contaminants \cite{Tanner1998,Newsome2004,Motley2014,Salter2014}. 
- Additionally, bioinformatic errors may lead to false positive contaminants, either due to errors in the database or bioinformatic errors by classification algorithm. 
+ Additionally, bioinformatic errors may lead to false positive contaminants, either due to errors in the database or bioinformatic errors by the classification algorithm. 
  Genomic purity analysis of the \textit{S. aureus} material identified a number of candidate contaminants,  the most abundant of which was \textit{E. coli}. 
- \textit{E. coli} is a well documented contaminant of molecular biology reagents, and not likely a true contaminant \cite{Salter2014}. Lower abundant contaminants maybe bioinformatic errors and not true contaminants. 
+ \textit{E. coli} is a well-documented contaminant of molecular biology reagents, and not likely a true contaminant \cite{Salter2014}. Lower abundant contaminants may be bioinformatic errors and not true contaminants. 
  While, contaminants identified by the Genomic Purity Pipeline are most likely from reagents and due to bioinformatic errors, a conservative estimate of the material purity, assuming all contaminants are real, reported by the pipeline. Users will want to take into consideration the limited specificity of the taxonomic classification method. 
- For example if the intended use of the genomic DNA is for use as part of an inclusivity exclusivity pannel, additional genomic purity assessment in addition to the PEPR Genomic Purity Pipeline is required to validate the material.
+ For example if the intended use of the genomic DNA is for use as part of an inclusivity exclusivity panel, additional genomic purity assessment in addition to the PEPR Genomic Purity Pipeline is required to validate the material.
 
 %%% Commenting out overall proportion figure %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% <<contamCountsFig, fig.align = "center", fig.lp = "fig:", fig.height=4, fig.width=4, fig.ext='eps', fig.cap= "Proportion of reads from contaminant DNA. %%% Reads categorized as genomic contaminants as classified by PathoScope as not belonging to the genus \\textit{Staphylococcus}.">>=
@@ -378,7 +365,7 @@ contam_point_line_figure(peprDB, rm_genus) + theme(axis.text.y = element_text(fa
 
 
 \section{Conclusions}
-PEPR provides a framework for characterizing microbial genomic reference materials, for instance a homogenized batch of DNA from a single prokaryotic strain. 
+PEPR provides a framework for characterizing microbial genomic reference materials, for instance, a homogenized batch of DNA from a single prokaryotic strain. 
 The objective in developing PEPR was to provide a reproducible and transparent workflow for the characterization of prokaryotic genomic materials. 
 The pipeline can be used to characterize reference materials as well as in-house quality control materials for which replicate sequencing datasets from multiple platforms are available. 
 
@@ -390,19 +377,19 @@ If another lab wishes to characterize a new reference or quality control materia
     \item Ideally, the user should generate a large batch of material and aliquot it to reduce inhomogeneity.
     \item Identify a high-quality genome assembly. If a good reference assembly does not exist for the sample, then long-read sequencing like PacBio may be required to generate an assembly, and ideally mapping technologies would be used to validate the assembly.
     \item Short-read whole genome sequencing, preferably from two orthogonal sequencing technologies, should be generated from multiple vials of the material, ideally 2 technical replicate libraries from at least six randomly selected vials.
-    \item PEPR can then be run to assess base-level purity and homogeneity, genomic contaminants, and mis-assemblies.
+    \item PEPR can then be run to assess base-level purity and homogeneity, genomic contaminants, and misassemblies.
 The methods presented in this work provide a straightforward pipeline that can be used by any laboratory to characterize new reference materials or in-house quality controls.
 \end{enumerate}
 
 
 The outputs from PEPR include a corrected reference genome assembly, identified genome position with high and low purity based on biological and technical variation, base level homogeneity of the material, as well as the percentage and identity of genus level genomic contaminants. The resulting characterization values are intentionally conservative and without uncertainty or confidence estimates, as sources of bias and error associated with the measurement process are currently not fully understood. 
 As the scientific community's understanding of the measurement process matures new algorithms can be incorporated into the pipeline to increase the quality of material characterization process. 
-The genomic materials characterized using PEPR will not only help increase confidence in measurement methods and assays, but can be used to benchmark and validate sequencing platforms and bioinformatic algorithm improving our understanding of sequencing and data analysis process.
+The genomic materials characterized using PEPR will not only help increase confidence in measurement methods and assays but can be used to benchmark and validate sequencing platforms and bioinformatic algorithm improving our understanding of sequencing and data analysis process.
 
 
 \begin{acknowledgements}
 The author’s would like to thank Jenny McDaniel, Lindsay Vang, and David Catoe for performing the MiSeq and PGM sequencing, and Tim Muruvanda for performing the PacBio sequencing. 
-Additionally, we would like to thank Drs. Nancy Lin and Steven Lund for converations and suggestions while developing PEPR and drafting the manuscript. 
+Additionally, we would like to thank Drs. Nancy Lin and Steven Lund for conversations and suggestions while developing PEPR and drafting the manuscript. 
 Department of Homeland Security (DHS) Science and Technology Directorate funded this project under Interagency Agreement HSHQPM-14-X-00078 with NIST. 
 This work was additionally supported by two interagency agreements between NIST and the FDA. 
 Opinions expressed in this paper are the authors’ and do not necessarily reflect the policies and views of the DHS, NIST, or affiliated venues. 
@@ -410,7 +397,6 @@ Certain commercial equipment, instruments, or materials are identified in this p
 Such identification is not intended to imply recommendation or endorsement by the NIST, nor is it intended to imply that the materials or equipment identified are necessarily the best available for the purpose.
 Official contribution of NIST; not subject to copyrights in USA.
 \end{acknowledgements}
-
 
 \bibliographystyle{vancouver}
 \bibliography{pepr-pub}
