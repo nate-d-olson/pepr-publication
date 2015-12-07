@@ -215,30 +215,30 @@ Prior to being used as input, the assembly was validated using optical mapping d
 Eight replicate vials of the candidate reference material were sequenced on the Illumina MiSeq and Ion Torrent PGM sequencing platforms (Supplemental Methods).
 
 \section{Results and Discussion}
-Pipelines for Evaluating Prokaryotic References (PEPR) uses biological and technical replicate sequencing data from orthogonal sequencing platforms to characterize a microbial material's genome. 
+Pipelines for Evaluating Prokaryotic References (PEPR) uses biological and technical replicate sequencing data from orthogonal sequencing platforms to characterize the reference genome of a prokaryotic material. 
+The prokaryotic material is a batch of genomic DNA extracted from a prokaryotic culture. 
 There are two primary reasons for using replicate sequencing datasets. 
-One is to test for homogeneity within the batch of DNA being characterized. 
+One is to test for homogeneity within the batch of DNA. 
 The second is to minimize the impact of library specific biases. 
 The resulting characterized genome is suitable for  evaluating and benchmarking whole genome sequencing methods. 
 PEPR consists of three pipelines: genome evaluation, genome characterization, and genomic purity assessment (Fig. \ref{fig:workflowFig}). 
-In the following section characterization results for the NIST \textit{S. aureus} candidate reference material are presented along with a discussion of the assumptions and limitations of PEPR. 
+The following section includes the characterization results for the NIST \textit{S. aureus} candidate reference material along with a discussion of PEPR's assumptions and limitations. 
 
 
 \subsection{Preparation of Reference Assembly} 
-A user provided high-quality closed reference assembly free of large assembly errors should be used as input when running PEPR.
-For the \textit{S. aureus} RM, the reference assembly was constructed from Pacific Biosciences (PacBio) RSII long read sequencing data.
-%% add reference to supplemental 
-To validate the \textit{S. aureus} reference assembly prior to evaluation with PEPR, a whole genome map was generated with the OpGen optical mapping technology. 
-The long DNA fragments used in optical mapping (average size \textgreater 200 Mb) allows for the indentification of large misassemblies (\textgreater 3 kb) not easily identified using short-read sequencing data \cite{Mendelowitz2014}. 
-Optical mapping technologies and large insert mate-pair and synthetic long-read library preparation methods \cite{McCoy2014}, are potential alternatives to optical mapping for identifying large misassemblies. 
+A user provided high-quality closed reference assembly free of large assembly errors should be used as input when running PEPR. 
+Optical mapping, as well as large insert mate-pair and synthetic long-read library preparation methods \cite{McCoy2014}, are a few orthogonal methods that can be used to identify large misassemblies. 
+The long DNA fragments used in optical mapping (average size \textgreater 200 Mb) allows for the indentification of large misassemblies (\textgreater 3 kb) that are not easily identified using short-read sequencing data \cite{Mendelowitz2014}. 
+For the \textit{S. aureus} RM, the reference assembly was constructed from Pacific Biosciences (PacBio) RSII long read sequencing data (Supplemental Material).
+To validate the \textit{S. aureus} reference assembly prior to evaluation with PEPR, OpGen optical mapping technology was used. 
 The \textit{S. aureus} optical mapping results were in agreement with the  PacBio assembly, indicating no large misassemblies, and that the assembly was suitable for use in PEPR. 
 
 
 \subsection{Genome Evaluation}
-The first step in PEPR is the \textit{Genome Evaluation} pipeline. 
+The \textit{Genome Evaluation} pipeline is the first step in PEPR. 
 Pilon was chosen for the evaluation step as it assesses the accuracy of the genome and corrects errors in the assembly \cite{Walker2014}. 
+While currently not part of the PEPR, PAGIT and REAPR are two alternative methods for evaluating and correcting genome assemblies similar to Pilon \cite{Swain2012,Hunt2013}. 
 Other methods are available for evaluating reference genomes, e.g. amosValidate \cite{Phillippy2008} and ALE \cite{Clark2013}, however these methods only assess assembly accuracy without correcting misassemblies. 
-\emph{ADD DISCUSSION OF PAGIT AND REAPR POTENTIALLY OTHER ASSEMBLY VALIDATION METHODS}
 The resulting reference assembly represents the consensus genome of the population of cells used to generate the material. 
 The genome evaluation pipeline does not attempt to identify or characterize low-frequency structural variants within the material or vial-to-vial variability of the reference genome. 
 The evaluation pipeline failed to identify any assembly or base call errors in the \textit{S. aureus} candidate genome assembly. 
@@ -248,15 +248,15 @@ The candidate genome, once evaluated, and if necessary refined during the \texti
 \subsection{Genome Characterization}
 The \textit{Genome Characterization} pipeline calculates whole genome base level statistics using replicate sequencing data from orthogonal measurement methods. 
 As part of the characterization pipeline, summary statistics are generated for the user provided sequencing datasets. 
-While PEPR only uses short-read sequencing data to evaluate the material, summary statistics for additional sequence data, such as long read data used to generate the reference assembly, can be calculated.  
+While PEPR only uses short-read sequencing data to evaluate the material, dataset summary statistics for additional sequence data, such as long read data used to generate the reference assembly, can be calculated.  
 The results from our analysis of the \textit{S. aureus} candidate reference material using PEPR provides an example of the type of information, summary figures, and tables that can be generated with PEPR.
 
 
 \subsubsection{Sequencing Data Summary Statistics}
 Summary statistics were calculated for the number of reads, mapped read length, insert size for paired-end datasets, and coverage for \textit{S. aureus} datasets (Table \ref{Table:seqTable}). 
 The MiSeq sequencing run had an average of \Sexpr{round(mean_miseq_library_read_count/2000000, digits = 1)} million paired-end reads per library with a median read length of \Sexpr{miseq_med_read_length} bp, whereas the PGM sequencing run produced \Sexpr{round(mean_pgm_library_read_count/2000000, digits = 1)} million reads per library on average with a median read length of \Sexpr{pgm_med_read_length} bp. 
-Based on the sequencing methods used \emph{REFERENCE SUPPLEMENTAL MATERIAL}, longer reads were expected for PGM. The shorter read length is potentially due to the low GC content, which is known to challenge current sequencing technologies \cite{Quail2012}.
-The higher throughput and paired-end reads resulted in a higher coverage for MiSeq compared to PGM (\Sexpr{paste0(as.character(mean_miseq_library_coverage),"X")} vs. \Sexpr{ paste0(as.character(mean_pgm_library_coverage),"X")}). 
+Based on the sequencing methods used (Supplemental Material), longer reads were expected for PGM. The shorter read length is potentially due to the low GC content, which is known to challenge current sequencing technologies \cite{Quail2012}.
+The higher throughput and paired-end reads resulted in higher coverage for MiSeq compared to PGM (\Sexpr{paste0(as.character(mean_miseq_library_coverage),"X")} vs. \Sexpr{ paste0(as.character(mean_pgm_library_coverage),"X")}). 
 The three PacBio datasets are library replicates run on different SMRT cells.
 The replicate libraries had a median subread length \Sexpr{paste0(as.character(pacbio_med_read_length),"bp")} and \Sexpr{paste0(as.character(pacbio_total_coverage),"X")} total coverage. 
 Between the three platforms a total coverage of \Sexpr{paste0(as.character(total_coverage),"X")}. 
@@ -288,7 +288,7 @@ We compared purity metric values between two orthogonal sequencing methods, MiSe
 Positions with purity metric values greater than 0.99 were categorized as high purity and less than 0.99 low purity. 
 Out of \Sexpr{total_pos} positions in the genome \Sexpr{pos_pur_gt99_both} positions had purity values greater than 0.99 for both short-read sequencing platforms (Table \ref{Table:purityTable}). 
 Further, \Sexpr{pos_pur_gt99_one} and \Sexpr{pos_pur_gt97_one} positions had purity values greater than 0.99 and 0.97, respectively, for one of the two platforms. 
-Only \Sexpr{pos_pur_lt99_both} positions had a purity values less than 0.99 for both platforms, and no positions had a purity value less than \Sexpr{min_max_pur_position} for both platforms. 
+Only \Sexpr{pos_pur_lt99_both} positions had purity values less than 0.99 for both platforms, and no positions had purity value less than \Sexpr{min_max_pur_position} for both platforms. 
 The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (Fig. \ref{fig:purityPositionFig}). The difference in low-purity position distributions are due to differences in the systematic sequencing error profiles for the two platforms.  PGM has a higher error rate for homopolymers, whereas MiSeq has more contect specfic sequencing error profile \cite{Quail2012}. 
 
 
@@ -392,10 +392,10 @@ If another lab wishes to characterize a new reference or quality control materia
     \item PEPR can then be run to assess base-level purity and homogeneity, genomic contaminants, and misassemblies.
 \end{enumerate}
 
-PEPR outputs include a corrected reference genome assembly, identified genome position with high and low purity based on biological and technical variation, base level homogeneity of the material, as well as the percentage and identity of genus level genomic contaminants. 
+PEPR outputs include a corrected reference genome assembly, genome position with high and low purity based on biological and technical variation, base level homogeneity of the material, as well as the percentage and identity of genus level genomic contaminants. 
 The resulting characterization values are intentionally conservative and without uncertainty or confidence estimates, as sources of bias and error associated with the measurement process are currently not fully understood. 
 As the scientific community's understanding of the measurement process matures new algorithms can be incorporated into the pipeline to increase the quality of material characterization process. 
-The genomic materials characterized using PEPR will not only help increase confidence in measurement methods and assays but can be used to benchmark and validate sequencing platforms and bioinformatic algorithm improving our understanding of sequencing and data analysis process.
+The genomic materials characterized using PEPR will not only help increase confidence in measurement methods but can be used to benchmark and validate sequencing platforms and bioinformatic algorithm improving our understanding of the sequencing and data analysis process.
 
 
 \begin{acknowledgements}
