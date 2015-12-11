@@ -36,6 +36,10 @@ Sys.setenv(TEXINPUTS=getwd(),
 % insert here the call for the packages your document requires
 \usepackage{latexsym}
 \usepackage{url}
+
+\usepackage[pagewise]{lineno}
+\linenumbers
+
 % etc.
 %
 % please place your own definitions here and don't use \def but
@@ -176,6 +180,7 @@ The package includes functions to generate a number of summary tables and figure
 The Genome Evaluation Pipeline is the first step in the PEPR workflow and is used to reduce errors in the user provided genome assembly prior to characterization. 
 The \texttt{evaluation} pipeline consists of three steps. 
 Illumina sequencing data are retrieved from the Genbank Sequence Read Archive (SRA) using the sratoolkit \texttt{fastq-dump} command (\url{http://ncbi.github.io/sra-tools/}). 
+User can also run the pipeline using fastq files by including file paths in the pipeline parameters file. 
 Next, sequencing reads are mapped to the reference genome using BWA mem algorithm \cite{Li2013c}. 
 Finally, Pilon is used to evaluate and polish the reference assembly \cite{Walker2014}. 
 The corrected reference genome is then used as input for the Genome Characterization Pipeline.
@@ -187,7 +192,7 @@ The Genome Characterization Pipeline uses replicate sequence dataset from multip
 Illumina data are aligned to the reference genome using the same methods as the \texttt{evaluation} pipeline. 
 IonTorrent PGM data using the TMAP algorithm \cite{Homer}. 
 Additionally, if Pacific Biosciences (PacBio) sequencing data is used to generate the input reference assembly. 
-The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c} and  Next the sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deletion using the GenomeAnalysisToolKit \cite{McKenna2010,DePristo2011}. 
+The PacBio sequencing data is mapped to the reference genome using the BWA mem algorithm \cite{Li2013c}. Sequence alignment files are processed prior to downstream analysis by marking duplicates with Picard's MarkDuplicates command (\url{http://broadinstitute.github.io/picard}) and realigning reads mapping to regions with insertions or deletion using the GenomeAnalysisToolKit \cite{McKenna2010,DePristo2011}. 
 After refining the alignment files, base level analysis is performed using the short-read sequencing data. 
 For each platform a VCF (variant call format) file with a number of summary statistics is generated using SAMtools mpileup \cite{Li2009}. 
 A base purity metric is calculated from the resulting VCF files. 
@@ -201,7 +206,8 @@ Additionally, a number of summary statistics are calculated for the sequencing d
 
 \subsection{Genome Purity Pipeline}
 \label{method:4}
-The Genomic Purity Pipeline assesses the purity of the genomic material, in terms of the presence of DNA from sources other than the expected genus was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 \cite{Hong2014}. 
+The Genomic Purity Pipeline assesses the purity of the genomic material, was defined as presence of DNA from sources other than the expected genus. 
+Material genomic purity was assessed using the metagenomic taxonomic read classification algorithm PathoScope 2.0 \cite{Hong2014}. 
 This method uses an expectation maximization algorithm where the sequence data are first mapped to a database comprised of all sequence data in the Genbank nt database. 
 Then, through an iterative process PathoScope re-assigns ambiguously mapped reads to a taxonomic group based on the proportion of reads mapped unambiguously to individual taxonomic groups in the database. 
 Using short-read sequencing data as input PathoScope 2.0 first filters and trims low-quality reads (PathoQC), followed by mapping reads to a reference database (PathoMap - a wrapper for bowtie2 \cite{Langmead2012}), then the expectation-maximization algorithm (PathoID) is used for the taxonomic classification. 
@@ -289,7 +295,7 @@ Positions with purity metric values greater than 0.99 were categorized as high p
 Out of \Sexpr{total_pos} positions in the genome \Sexpr{pos_pur_gt99_both} positions had purity values greater than 0.99 for both short-read sequencing platforms (Table \ref{Table:purityTable}). 
 Further, \Sexpr{pos_pur_gt99_one} and \Sexpr{pos_pur_gt97_one} positions had purity values greater than 0.99 and 0.97, respectively, for one of the two platforms. 
 Only \Sexpr{pos_pur_lt99_both} positions had purity values less than 0.99 for both platforms, and no positions had purity value less than \Sexpr{min_max_pur_position} for both platforms. 
-The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (Fig. \ref{fig:purityPositionFig}). The difference in low-purity position distributions are due to differences in the systematic sequencing error profiles for the two platforms.  PGM has a higher error rate for homopolymers, whereas MiSeq has more contect specfic sequencing error profile \cite{Quail2012}. 
+The positions with low purity for MiSeq were non-uniformly distributed whereas positions with low purity for PGM were uniformly distributed (Fig. \ref{fig:purityPositionFig}). The difference in low-purity position distributions are due to differences in the systematic sequencing error profiles for the two platforms.  PGM has a higher error rate for homopolymers, whereas MiSeq has more context specific sequencing error profile \cite{Quail2012}. 
 
 
 << purityTable, results='asis'>>=
