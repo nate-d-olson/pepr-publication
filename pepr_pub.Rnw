@@ -111,7 +111,7 @@ We have developed a reproducible and transparent bioinformatics tool, PEPR, Pipe
 PEPR evaluates the quality, purity, and homogeneity of the reference material genome, and purity of the genomic material.
 The quality of the genome is evaluated using high coverage paired-end sequence data; coverage, paired-end read size and direction, as well as soft-clipping rates, are used to identify mis-assemblies. 
 The homogeneity and purity of the material relative to the reference genome are characterized by comparing base calls from replicate datasets generated using multiple sequencing technologies. 
-The genomic purity of the material is assessed by checking for DNA contaminants.
+Genomic purity of the material is assessed by checking for DNA contaminants.
 We demonstrate the tool and its output using sequencing data while developing a \textit{Staphylococcus aureus} candidate genomic reference material. 
 PEPR is open source and available at \url{https://github.com/usnistgov/pepr}.
 
@@ -154,7 +154,7 @@ Here we will first describe PEPR then show how PEPR was used to characterize NIS
 \begin{figure*}
 \includegraphics[width=\textwidth]{pepr-workflow.png}
 \label{fig:workflowFig}
-\caption{PEPR workflow. White objects are pipeline inputs, grey objects are the three pipeline components, light blue objects are the pipeline products.}
+\caption{PEPR workflow. White objects are pipeline inputs, grey objects are the three pipeline components, and light blue objects are the pipeline products.}
 \end{figure*}
 
 
@@ -199,7 +199,7 @@ The base purity metric is the number of high-quality bases (quality score $\geq$
 The metric is calculated from the SAMtools DP4 INFO tag in the vcf output generated with the mpileup command.
 Homogeneity analysis, a measure of genomic content similarity between vials of the reference material, is performed by first generating a pileup file using SAMtools mpileup for each dataset then performing pairwise tumor-normal variant calling using VarScan \cite{Koboldt2009}. 
 In this work, VarScan looks specifically for differences between vials in the proportion of reads containing variants. 
-A standard Benjamini-Hochberg procedure was used to assess the power of the homogeneity analysis (Supplemental Material, \url{https://github.com/DanSBS/NGSPower}). 
+A standard Benjamini-Hochberg procedure was used to assess the power of the homogeneity analysis (Electronic Supplemental Material, \url{https://github.com/DanSBS/NGSPower}). 
 Additionally, a number of summary statistics are calculated for the sequencing datasets using Picard's Collect Multiple Metrics (\url{http://broadinstitute.github.io/picard}). 
 
 
@@ -217,7 +217,7 @@ The annotated Genbank nt database provided by the PathoScope developers was used
 Sequencing data and the reference assembly for the NIST candidate reference material \textit{S. aureus} was used to demonstrate how PEPR is used to characterize a genomic material. 
 A \textit{de novo} genome assembly from Pacific Biosciences (PacBio) long-read sequencing data was used as input for PEPR. 
 Prior to being used as input, the assembly was validated using optical mapping data. 
-Eight replicate vials of the candidate reference material were sequenced on the Illumina MiSeq and Ion Torrent PGM sequencing platforms (Supplemental Methods).
+Eight replicate vials of the candidate reference material were sequenced on the Illumina MiSeq and Ion Torrent PGM sequencing platforms (Electronic Supplemental Material).
 
 \section{Results and Discussion}
 Pipelines for Evaluating Prokaryotic References (PEPR) uses biological and technical replicate sequencing data from orthogonal sequencing platforms to characterize the reference genome of a prokaryotic material. 
@@ -234,7 +234,7 @@ The following section includes the characterization results for the NIST \textit
 A user provided high-quality closed reference assembly free of large assembly errors should be used as input when running PEPR. 
 Optical mapping, as well as large insert mate-pair and synthetic long-read library preparation methods \cite{McCoy2014}, are a few orthogonal methods that can be used to identify large mis-assemblies. 
 The long DNA fragments used in optical mapping (average size \textgreater 200 Mb) allows for the identification of large mis-assemblies (\textgreater 3 kb) that are not easily identified using short-read sequencing data \cite{Mendelowitz2014}. 
-For the \textit{S. aureus} RM, the reference assembly was constructed from Pacific Biosciences (PacBio) RSII long-read sequencing data (Supplemental Material).
+For the \textit{S. aureus} RM, the reference assembly was constructed from Pacific Biosciences (PacBio) RSII long-read sequencing data (Electronic Supplemental Material).
 To validate the \textit{S. aureus} reference assembly prior to evaluation with PEPR, OpGen optical mapping technology was used. 
 The \textit{S. aureus} optical mapping results were in agreement with the  PacBio assembly, indicating no large mis-assemblies, and that the assembly was suitable for use in PEPR. 
 
@@ -260,7 +260,7 @@ The results from our analysis of the \textit{S. aureus} candidate reference mate
 \subsubsection{Sequencing Data Summary Statistics}
 Summary statistics were calculated for the number of reads, mapped read length, insert size for paired-end datasets, and coverage for \textit{S. aureus} datasets (Table \ref{Table:seqTable}). 
 The MiSeq sequencing run had an average of \Sexpr{round(mean_miseq_library_read_count/2000000, digits = 1)} million paired-end reads per library with a median read length of \Sexpr{miseq_med_read_length} bp, whereas the PGM sequencing run produced \Sexpr{round(mean_pgm_library_read_count/2000000, digits = 1)} million reads per library on average with a median read length of \Sexpr{pgm_med_read_length} bp. 
-Based on the sequencing methods used (Supplemental Material), longer reads were expected for PGM. The shorter read length is potentially due to the low GC content, which is known to challenge current sequencing technologies \cite{Quail2012}.
+Based on the sequencing methods used (Electronic Supplemental Material), longer reads were expected for PGM. The shorter read length is potentially due to the low GC content, which is known to challenge current sequencing technologies \cite{Quail2012}.
 The higher throughput and paired-end reads resulted in higher coverage for MiSeq compared to PGM (\Sexpr{paste0(as.character(mean_miseq_library_coverage),"X")} vs. \Sexpr{ paste0(as.character(mean_pgm_library_coverage),"X")}). 
 The three PacBio datasets are library replicates run on different SMRT cells.
 The replicate libraries had a median subread length \Sexpr{paste0(as.character(pacbio_med_read_length),"bp")} and \Sexpr{paste0(as.character(pacbio_total_coverage),"X")} total coverage. 
@@ -314,7 +314,7 @@ pur_dat_id %>%
 The sequencing technologies used to characterize the material are still maturing, and an incomplete understanding of platform-specific biases limits our ability to provide a confidence value for the base calls. 
 A number of base level metrics, such as strand bias, are calculated as part of the PEPR Genome Characterization Pipeline and are included in the pipeline results database. 
 These metrics can be used to differentiate positions with low purity due to measurement error and those due to biological variability. 
-Use of additional metrics and algorithms developed for the identification of low-frequency variants, such as loFreq \cite{Wilm2012}, could help identify positions with low levels of biological variability, but are not currently implemented in PEPR. 
+Use of additional metrics and algorithms developed for the identification of low-frequency variants, such as LoFreq \cite{Wilm2012}, could help identify positions with low levels of biological variability, but are not currently implemented in PEPR. 
 
 
 << purityScatterFig, fig.align='center', fig.height=5, fig.width=6, fig.ext='eps', fig.cap= "Comparison of base purity values for PGM and MiSeq. Positions are colored based of high and low purity values for the two sequencing platforms, MiSeq - Illumina MiSeq and PGM - Ion Torrent PGM. A purity value of 0.99 was used to differentiate between high and low purity positions. Positions with high purity for both platforms were excluded from the figure.", fig.lp = "fig:">>=
@@ -414,6 +414,10 @@ Certain commercial equipment, instruments, or materials are identified in this p
 Such identification is not intended to imply recommendation or endorsement by the NIST, nor is it intended to imply that the materials or equipment identified are necessarily the best available for the purpose.
 Official contribution of NIST; not subject to copyrights in USA.
 \end{acknowledgements}
+
+\section*{Conflict of Interest Statement}
+The authors declare no competing interests.
+
 
 \bibliographystyle{vancouver}
 \bibliography{pepr-pub}
